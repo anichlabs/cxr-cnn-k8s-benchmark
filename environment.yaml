@@ -1,0 +1,34 @@
+name: thesis
+channels:
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - ipykernel
+  - jupyterlab
+  - matplotlib
+  - seaborn
+  - pandas
+  - scikit-learn
+  - opencv
+  - pillow
+  - tqdm
+  - pyyaml
+  - numpy
+  - psutil
+  - networkx
+  - filelock
+  - jinja2
+  - packaging
+  - traitlets
+  - setuptools
+  - wheel
+  - zipp
+  - pip:
+      # GPU build (CUDA 12.8 is used)
+      - torch==2.10.0.dev20250922+cu128 --extra-index-url https://download.pytorch.org/whl/nightly/cu128
+      - torchvision==0.21.0+cu124 --extra-index-url https://download.pytorch.org/whl/nightly/cu124
+      - torchaudio==2.5.0.dev20250922+cu128 --extra-index-url https://download.pytorch.org/whl/nightly/cu128
+      - grad-cam
