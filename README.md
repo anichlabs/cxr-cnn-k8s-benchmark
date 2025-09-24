@@ -1,5 +1,5 @@
 
-# Research Proposal: Comparing Custom and Transfer-Learning CNN Models for Chest X-ray Classification: Evaluating Performance and Scalability with Kubernetes Orchestration.
+# Research: Comparing Custom and Transfer-Learning CNN Models for Chest X-ray Classification: Evaluating Performance and Scalability with Kubernetes Orchestration.
 
 This repository is organised to ensure modularity, reproducibility, and clarity for academic research.
 ---
