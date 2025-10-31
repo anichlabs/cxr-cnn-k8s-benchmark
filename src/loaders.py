@@ -1,7 +1,7 @@
 """
 loader.py
 ---------
-Utilities for building stratified PyTorch DataLoaders from the unifid CXR dataset.
+Utilities for building stratified PyTorch DataLoaders from the unified CXR dataset.
 
 Validated originally in '02_training_baseline.ipynb' and refactored here to
 enable consistent, reproducible dataset splits across all experiments.
