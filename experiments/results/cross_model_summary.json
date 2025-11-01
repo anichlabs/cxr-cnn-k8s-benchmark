@@ -1,0 +1,62 @@
+{
+  "vitorio_imagenet": {
+    "best_val_acc": 0.8877433746360069,
+    "epoch_best": 10,
+    "final_val_acc": 0.8877433746360069,
+    "final_val_loss": 0.44466359393541205
+  },
+  "victorio_cxr": {
+    "best_val_acc": 0.8692198478898336,
+    "epoch_best": 8,
+    "final_val_acc": 0.8663128711456476,
+    "final_val_loss": 0.48229958498200703
+  },
+  "efficientnet_b0_cxr": {
+    "best_val_acc": 0.9943719575571459,
+    "epoch_best": 8,
+    "final_val_acc": 0.9891072872073151,
+    "final_val_loss": 0.19689351112343545
+  },
+  "efficientnet_b0_imagenet": {
+    "best_val_acc": 0.9931043802305709,
+    "epoch_best": 10,
+    "final_val_acc": 0.9931043802305709,
+    "final_val_loss": 0.1867564330960429
+  },
+  "vitorio_cxr": {
+    "best_val_acc": 0.8652227548665778,
+    "epoch_best": 10,
+    "final_val_acc": 0.8652227548665778,
+    "final_val_loss": 0.493680102880611
+  },
+  "mobilenet_v2_cxr": {
+    "best_val_acc": 0.9936452133710995,
+    "epoch_best": 10,
+    "final_val_acc": 0.9936452133710995,
+    "final_val_loss": 0.18895990002986995
+  },
+  "victorio_imagenet": {
+    "best_val_acc": 0.8980952542881633,
+    "epoch_best": 10,
+    "final_val_acc": 0.8980952542881633,
+    "final_val_loss": 0.4135516528473344
+  },
+  "resnet50_cxr": {
+    "best_val_acc": 0.9914649808129599,
+    "epoch_best": 8,
+    "final_val_acc": 0.9862003104631291,
+    "final_val_loss": 0.20537040815796964
+  },
+  "resnet50_imagenet": {
+    "best_val_acc": 0.9894706593003384,
+    "epoch_best": 5,
+    "final_val_acc": 0.9872904267421988,
+    "final_val_loss": 0.20100263627462608
+  },
+  "mobilenet_v2_imagenet": {
+    "best_val_acc": 0.9930959302325582,
+    "epoch_best": 5,
+    "final_val_acc": 0.9887439151142918,
+    "final_val_loss": 0.19246795045775036
+  }
+}
