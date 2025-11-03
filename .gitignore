@@ -3,3 +3,6 @@
 
 # Ignore all data files.
 data/
+
+# Ignore all model checkpoints.
+experiments/checkpoints/
