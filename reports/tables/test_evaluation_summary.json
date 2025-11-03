@@ -1,0 +1,74 @@
+{
+  "efficientnet_b0_cxr_best": {
+    "model": "efficientnet_b0",
+    "normalisation": "CXR",
+    "accuracy": 0.9992679355783309,
+    "precision": 0.9993069993069993,
+    "recall": 0.9992025518341308,
+    "f1_score": 0.9992539374944179,
+    "auroc": 0.9999983750126104
+  },
+  "efficientnet_b0_imagenet_best": {
+    "model": "efficientnet_b0",
+    "normalisation": "ImageNet",
+    "accuracy": 0.9970717423133236,
+    "precision": 0.9971240291520375,
+    "recall": 0.9969132110579478,
+    "f1_score": 0.9970152775908172,
+    "auroc": 0.9999789325566404
+  },
+  "mobilenet_v2_cxr_best": {
+    "model": "mobilenet_v2",
+    "normalisation": "CXR",
+    "accuracy": 0.9956076134699854,
+    "precision": 0.9955243221690591,
+    "recall": 0.9955243221690591,
+    "f1_score": 0.9955243221690591,
+    "auroc": 0.9999740002017642
+  },
+  "mobilenet_v2_imagenet_best": {
+    "model": "mobilenet_v2",
+    "normalisation": "ImageNet",
+    "accuracy": 0.9934114202049781,
+    "precision": 0.9937132684176255,
+    "recall": 0.9929259702286019,
+    "f1_score": 0.9932788036569895,
+    "auroc": 0.9999121932882469
+  },
+  "resnet50_cxr_best": {
+    "model": "resnet50",
+    "normalisation": "CXR",
+    "accuracy": 0.9970717423133236,
+    "precision": 0.997245179063361,
+    "recall": 0.996810207336523,
+    "f1_score": 0.9970143100329821,
+    "auroc": 0.9999748413918125
+  },
+  "resnet50_imagenet_best": {
+    "model": "resnet50",
+    "normalisation": "ImageNet",
+    "accuracy": 0.9941434846266471,
+    "precision": 0.9937936204654619,
+    "recall": 0.9943414407230197,
+    "f1_score": 0.9940376893722477,
+    "auroc": 0.9999488415935766
+  },
+  "victorio_cxr_best": {
+    "model": "victorio",
+    "normalisation": "CXR",
+    "accuracy": 0.8748169838945827,
+    "precision": 0.8743418685970834,
+    "recall": 0.8751141645878487,
+    "f1_score": 0.874584622710131,
+    "auroc": 0.9622767840735839
+  },
+  "victorio_imagenet_best": {
+    "model": "victorio",
+    "normalisation": "ImageNet",
+    "accuracy": 0.9114202049780381,
+    "precision": 0.910226410217053,
+    "recall": 0.9121216381084801,
+    "f1_score": 0.9103509006752706,
+    "auroc": 0.9777687194850339
+  }
+}

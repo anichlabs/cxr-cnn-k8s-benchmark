@@ -1,0 +1,9 @@
+name,model,normalisation,accuracy,precision,recall,f1_score,auroc
+efficientnet_b0_cxr_best,efficientnet_b0,CXR,0.999268,0.999307,0.999203,0.999254,0.999998
+efficientnet_b0_imagenet_best,efficientnet_b0,ImageNet,0.997072,0.997124,0.996913,0.997015,0.999979
+mobilenet_v2_cxr_best,mobilenet_v2,CXR,0.995608,0.995524,0.995524,0.995524,0.999974
+mobilenet_v2_imagenet_best,mobilenet_v2,ImageNet,0.993411,0.993713,0.992926,0.993279,0.999912
+resnet50_cxr_best,resnet50,CXR,0.997072,0.997245,0.996810,0.997014,0.999975
+resnet50_imagenet_best,resnet50,ImageNet,0.994143,0.993794,0.994341,0.994038,0.999949
+victorio_cxr_best,victorio,CXR,0.874817,0.874342,0.875114,0.874585,0.962277
+victorio_imagenet_best,victorio,ImageNet,0.911420,0.910226,0.912122,0.910351,0.977769
