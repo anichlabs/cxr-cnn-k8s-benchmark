@@ -4,5 +4,6 @@
 # Ignore all data files.
 data/
 
-# Ignore all model checkpoints.
-experiments/checkpoints/
+# Ignore all model checkpoints, but keep directory placeholder
+experiments/checkpoints/*
+!experiments/checkpoints/.gitkeep
