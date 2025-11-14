@@ -1,0 +1,53 @@
+##############################################
+# FastAPI Inference API - Requirements File  #
+##############################################
+# This file lists ONLY the libraries needed  #
+# for deploying and running the inference    #
+# service described in Notebook 06.          #
+#                                            #
+# It does NOT include large research         #
+# dependencies (matplotlib, sklearn, lime).  #
+# Those remain in environment.yaml and the   #
+# notebooks (01-05).                         #
+##############################################
+
+##############
+# API Layer  #
+##############
+# FastAPI is the web framework that defines routes (/predict).
+# Uvicorn is the Asynchronous Server Gateway Interface (ASGI) server 
+# used to run the FastAPI app.
+# Pydantic is used internally by FastAPI for request/response models.
+fastapi==0.115.0
+uvicorn[standard]==0.30.1
+pydantic==2.9.2
+
+# Allows FastAPI to accept file uploads (UploadFile) in /predict.
+python-multipart==0.0.9
+
+
+####################
+# Inference Stack  #
+####################
+# PyTorch and Torchvision are needed to:
+# - reconstruct the model architecture (mobilenet_v2, efficientnet_b0, etc.)
+# - load trained checkpoints (*.pt)
+# - apply training-time transforms (Resize, CenterCrop, Normalise)
+torch==2.2.2
+torchvision==0.17.2
+
+# Pillow is required to load medical images (PIL.Image.open).
+pillow==10.3.0
+
+# Numerical foundation for PyTorch and general array operations.
+numpy==1.26.4
+
+
+#########################
+# Lightweight Data I/O  #
+#########################
+# Pandas is needed to read the preprocessing_config.json or
+# CSV-based metadata if required in later expansions of the API.
+# It is deliberately kept because the notebooks use pandas for
+# interpreting the same configuration files that the API must reuse.
+pandas==2.2.2
