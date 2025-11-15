@@ -1,0 +1,92 @@
+################################################################
+# Containerfile: CPU Inference Service (FastAPI + PyTorch)     #
+################################################################
+# This Containerfile builds a REPRODUCIBLE, MINIMAL, and SAFE
+# container image for serving the CXR classifier via FastAPI.
+#
+# Notebook 06 explains the rationale behind each layer.
+#
+# This version:
+#   - runs on CPU (no CUDA)
+#   - loads preprocessing_config.json at startup
+#   - exposes /health, /metadata, /predict endpoints
+#   - uses dummy prediction until model integration step
+#
+# GPU support and checkpoint loading are added in a later stage:
+#   (Notebook 06, Section: Model Integration + GPU Variant)
+################################################################
+
+#########################
+# 1. Choose base image  #
+#########################
+# python:3.10-slim keeps the image small, secure, and fast to build.
+FROM python:3.10-slim AS base
+
+#########################
+# 2. Install OS deps    #
+#########################
+# Install ONLY what is required for PIL (pillow), torch, etc.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        gcc \
+        libjpeg-dev \
+        zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+###########################
+# 3. Create non-root user #
+###########################
+# SECURITY BEST PRACTICE:
+# Do not run inference services as root.
+RUN useradd -m appuser
+USER appuser
+
+##############################
+# 4. Create application dirs #
+##############################
+WORKDIR /app
+
+# Directory structure INSIDE the container:
+# /app
+#   ├── app/               <-- FastAPI code
+#   ├── config/            <-- preprocessing_config.json (mounted)
+#   └── requirements.txt
+
+##############################
+# 5. Copy dependency file    #
+##############################
+COPY --chown=appuser:appuser requirements.txt /app/requirements.txt
+
+##################################
+# 6. Install Python dependencies #
+##################################
+# pip install MUST run in clear environment without cache
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+#############################
+# 7. Copy API application   #
+#############################
+COPY --chown=appuser:appuser app/ /app/app/
+
+###########################################################
+# IMPORTANT: NOTE FOR LATER (DO NOT FORGET)
+# This placeholder remains until a real model is mounted
+# and load a checkpoint (Notebook 06: Model Integration).
+#
+# At this stage, only the API skeleton is tested.
+###########################################################
+
+###############################
+# 8. Expose port for FastAPI  #
+###############################
+EXPOSE 8000
+
+###########################################################
+# 9. Entrypoint: Uvicorn server                           #
+###########################################################
+# Runs:
+# uvicorn app.main:app --host 0.0.0.0 --port 8000
+#
+# --host 0.0.0.0 ensures external clients can access the service
+###########################################################
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
