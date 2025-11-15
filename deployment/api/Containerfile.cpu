@@ -40,6 +40,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN useradd -m appuser
 USER appuser
 
+# Ensure pip-installed scripts (uvicorn, fastapi, watchfiles, etc.)
+# are available on PATH for this non-root user.
+ENV PATH="/home/appuser/.local/bin:${PATH}"
+
 ##############################
 # 4. Create application dirs #
 ##############################
@@ -54,13 +58,13 @@ WORKDIR /app
 ##############################
 # 5. Copy dependency file    #
 ##############################
-COPY --chown=appuser:appuser requirements.txt /app/requirements.txt
+COPY --chown=appuser:appuser requirements-cpu.txt /app/requirements-cpu.txt
 
 ##################################
 # 6. Install Python dependencies #
 ##################################
 # pip install MUST run in clear environment without cache
-RUN pip install --no-cache-dir -r /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements-cpu.txt
 
 #############################
 # 7. Copy API application   #
@@ -89,4 +93,3 @@ EXPOSE 8000
 # --host 0.0.0.0 ensures external clients can access the service
 ###########################################################
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-

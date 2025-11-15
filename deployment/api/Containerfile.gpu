@@ -1,0 +1,70 @@
+################################################################
+# Containerfile: GPU Inference Service (FastAPI + PyTorch)     #
+################################################################
+# Same API as the CPU image, but with CUDA support enabled.
+#
+# Requirements:
+#   - NVIDIA GPU on host
+#   - Podman run with:  --gpus all
+#   - Torch installed WITH CUDA
+################################################################
+
+#########################
+# 1. Base image (CUDA)  #
+#########################
+# Use NVIDIA CUDA runtime with Ubuntu base — stable for PyTorch GPU.
+FROM nvidia/cuda:12.1.1-runtime-ubuntu22.04 AS base
+
+#########################
+# 2. Install OS deps    #
+#########################
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        python3 \
+        python3-pip \
+        python3-distutils \
+        gcc \
+        libjpeg-dev \
+        zlib1g-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Ensure 'python' points to Python 3
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+###########################
+# 3. Create non-root user #
+###########################
+RUN useradd -m appuser
+USER appuser
+
+ENV PATH="/home/appuser/.local/bin:${PATH}"
+
+##############################
+# 4. Create application dirs #
+##############################
+WORKDIR /app
+
+##############################
+# 5. Copy dependency file    #
+##############################
+COPY --chown=appuser:appuser requirements-gpu.txt /app/requirements-gpu.txt
+
+##################################
+# 6. Install Python dependencies #
+##################################
+# IMPORTANT — Torch must be GPU-enabled
+RUN pip install --no-cache-dir -r /app/requirements-gpu.txt
+
+#############################
+# 7. Copy API application   #
+#############################
+COPY --chown=appuser:appuser app/ /app/app/
+
+###############################
+# 8. Expose port for FastAPI  #
+###############################
+EXPOSE 8000
+
+###########################################################
+# 9. Entrypoint                                            #
+###########################################################
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

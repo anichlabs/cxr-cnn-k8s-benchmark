@@ -24,12 +24,14 @@ This file will later:
 - return predictions to external systems
 """
 
-from fastapi import FastAPI, UploadFile
+from fastapi import FastAPI, UploadFile, File
 from pathlib import Path
 from PIL import Image
 from torchvision import transforms
+from torchvision.transforms import InterpolationMode
 import torch
 import json
+from app.models.victorio import build_victorio
 
 ###########################################################
 # 1. Create the FastAPI application instance              #
@@ -51,7 +53,48 @@ app = FastAPI(
 
 
 ############################################################
-# 2. Define where configuration will live inside container #
+# 2. Model checkpoint path and architecture inference      #
+############################################################
+# This path will be mounted by Podman:
+#   -v $(pwd)/experiments/checkpoints/model.pt:app/model/model.pt:ro
+MODEL_PATH = Path("/app/model/model.pt")
+
+def parse_model_filename(ckpt_path: Path):
+    """
+    Parse clean checkpoint names of the form:
+        mobilenet_v2_imagenet_best.pt
+        efficientnet_b0_cxr_best.pt
+        resnet50_imagenet_best.pt
+        victorio_cxr_best.pt
+    """
+
+    stem = ckpt_path.stem
+    parts = stem.split("_")
+
+    # Architecture
+    if stem.startswith("mobilenet_v2"):
+        architecture = "mobilenet_v2"
+
+    elif stem.startswith("efficientnet_b0"):
+        architecture = "efficientnet_b0"
+
+    elif stem.startswith("resnet50"):
+        architecture = "resnet50"
+
+    elif stem.startswith("victorio"):
+        architecture = "victorio"
+
+    else:
+        raise ValueError(f"Cannot parse architecture from filename: {stem}")
+
+    # Domain is always before "best"
+    domain = parts[-2]  # "imagenet" or "cxr"
+
+    return architecture, domain
+
+
+############################################################
+# 3. Define where configuration will live inside container #
 ############################################################
 # When the Podman container is built, mount:
 #   experiments/pools/preprocessing_config.json
@@ -63,7 +106,7 @@ CONFIG_PATH = Path("/app/config/preprocessing_config.json")
 
 
 ############################################################
-# 3. Load configuration when the API starts                #
+# 4. Load configuration when the API starts                #
 ############################################################
 @app.on_event("startup")
 def load_config():
@@ -78,20 +121,99 @@ def load_config():
     - If they differ even slightly, inference becomes invalid.
     """
 
-    global cfg, img_size, mean, std
+    global cfg, img_size
     # Parse the config JSON file.
     cfg = json.loads(CONFIG_PATH.read_text())
 
     # Required configuration values.
     img_size = int(cfg["img_size"]) # For now, ImageNet mode
-    mean = cfg["imagenet_mean"]     # Allow swithing to CXR later.
-    std  = cfg["imagenet_std"]
 
     # No model is loaded yet: that comes in a later step.
 
+    # -------------------------------
+    # 1. Select device (CPU o GPU)
+    # -------------------------------
+    # The service should run on CPU by default, but seamlessly
+    # switch to GPU if the container is built with CUDA support
+    # and executed with -gpus all (Podman) or proper NVIDIA runtime.
+    #
+    # torch.cuda.is_available() returns True only when:
+    #   - the GPU variant of the image is used
+    #   - the NVIDIA libraries are present
+    #   - the runtime exposes the GPU to the container
+    #
+    # This keeps inference code simple and portable.
+    global device
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    # ---------------------------------------------------
+    # 4. Detect checkpoint if mounted into the container
+    # ---------------------------------------------------
+    global ckpt_arch, ckpt_domain
+
+    if MODEL_PATH.exists():
+        # Extract architecture ("mobilenet_v2") and domain ("imagenet" / "cxr")
+        ckpt_arch, ckpt_domain = parse_model_filename(MODEL_PATH)
+    else:
+        # No checkpoint means we stay in dummy mode
+        ckpt_arch, ckpt_domain = None, None
+
+    # ---------------------------------------------------
+    # 5. Adjust normalisation based on domain
+    # ---------------------------------------------------
+    global mean, std
+
+    # always define defaults first
+    mean = cfg["imagenet_mean"]
+    std  = cfg["imagenet_std"]
+
+    # override only if CXR model
+    if ckpt_domain == "cxr":
+        mean = cfg["cxr_mean"]
+        std  = cfg["cxr_std"]
+
+    # -------------------------------------------------------
+    # 6. Build model architecture if a checkpoint is present
+    # -------------------------------------------------------
+    global model
+
+    if ckpt_arch is None:
+        model = None # Stay in dummy mode
+        return
+    
+    num_classes = len(cfg["class_to_index"])
+
+    if ckpt_arch == "mobilenet_v2":
+        from torchvision.models import mobilenet_v2
+        model = mobilenet_v2(weights=None)
+        model.classifier[-1] = torch.nn.Linear(model.classifier[-1].in_features, num_classes)
+
+    elif ckpt_arch == "resnet50":
+        from torchvision.models import resnet50
+        model = resnet50(weights=None)
+        model.fc = torch.nn.Linear(model.fc.in_features, num_classes)
+
+    elif ckpt_arch == "efficientnet_b0":
+        from torchvision.models import efficientnet_b0
+        model = efficientnet_b0(weights=None)
+        model.classifier[1] = torch.nn.Linear(model.classifier[1].in_features, num_classes)
+
+    elif ckpt_arch == "victorio":
+        model = build_victorio(num_classes)
+
+    else:
+        raise ValueError(f"Unknown architecture: {ckpt_arch}")
+
+    # ------------------------------------------
+    # 7. Load weights and move model to device
+    # ------------------------------------------
+    state_dict = torch.load(MODEL_PATH, map_location=device)
+    model.load_state_dict(state_dict)
+    model.to(device)
+    model.eval() # important for dropout/batchnorm
 
 ###########################################################
-# 4. Health endpoint                                      #
+# 5. Health endpoint                                      #
 ###########################################################
 @app.get("/health")
 def health():
@@ -106,11 +228,11 @@ def health():
     - liveness probes
     - quick debugging
     """
-    return{"status": "ok"}
+    return {"status": "ok"}
 
 
 ###########################################################
-# 5. Metadata endpoint                                    #
+# 6. Metadata endpoint                                    #
 ###########################################################
 @app.get("/metadata")
 def metadata():
@@ -127,10 +249,10 @@ def metadata():
 
 
 ###########################################################
-# 6. Prediction endpoint                                  #
+# 7. Prediction endpoint                                  #
 ###########################################################
 @app.post("/predict")
-async def predict(file: UploadFile):
+async def predict(file: UploadFile = File(...)):
     """
     This endpoint receives a chest X-ray image (JPG/PNG),
     applies the SAME preprocessing as in training,
@@ -169,17 +291,37 @@ async def predict(file: UploadFile):
     x = tfm(img).unsqueeze(0)
 
     # ----------------------------------------------------
-    # 3. Dummy prediction
+    # 3. Real prediction if model is available
     # ----------------------------------------------------
-    # Later, replace this with:
-    #    model = load_state_dict(...)
-    #    pred  = model(x).argmax(dim=1)
-    dummy_prediction = torch.tensor([0])
+    if model is not None:
+        model.eval()
+        x = x.to(device)
+
+        with torch.no_grad():
+            logits = model(x)
+            pred_idx = int(logits.argmax(dim=1).item())
+
+        idx_to_class = {v: k for k, v in cfg["class_to_index"].items()}
+        pred_class = idx_to_class[pred_idx]
+
+        return {
+            "prediction_index": pred_idx,
+            "prediction_class": pred_class,
+            "architecture": ckpt_arch,
+            "domain": ckpt_domain,
+            "device": str(device),
+            "class_map": cfg["class_to_index"]
+        }
 
     # ----------------------------------------------------
-    # 4. Return results in JSON
+    # 4. Fallback: no checkpoint mounted (dummy mode)
     # ----------------------------------------------------
+    dummy_prediction = torch.tensor([0])
     return {
         "prediction_index": int(dummy_prediction.item()),
+        "prediction_class": "dummy",
+        "architecture": "none",
+        "domain": "none",
+        "device": str(device),
         "class_map": cfg["class_to_index"]
     }
