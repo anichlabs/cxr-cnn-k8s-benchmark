@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cxr-inference-cpu
+  namespace: inference
+  labels:
+    app: cxr-inference-cpu
+spec:
+  selector:
+    matchLabels:
+      app: cxr-inference-cpu
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: cxr-inference-cpu
+    spec:
+      containers:
+      - name: anichlabs-registry/cxr-inference:cpu-latest
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            cpu: "1000m"
+            memory: "2Gi"
+          limits:
+            cpu: "2000m"
+            memory: "4Gi"
+        env:
+        - name: MODEL_TYPE
+          value: "cpu"
+          nodeSelector:
+    nodeSelector:
+      type: "cpu"
+      
