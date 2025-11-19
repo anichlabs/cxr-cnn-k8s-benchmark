@@ -12,7 +12,6 @@
 # Jupyter notebooks (01–05).                 #
 ##############################################
 
-
 ##############
 # API Layer  #
 ##############
@@ -21,28 +20,11 @@ uvicorn[standard]==0.30.1
 pydantic==2.9.2
 python-multipart==0.0.9
 
-
-##########################
-# Inference Stack (GPU)  #
-##########################
-# IMPORTANT:
-#   These wheels MUST match your CUDA version.
-#   For CUDA 12.1 Runtime (Containerfile.gpu uses 12.1.1):
-#       torch==2.3.0+cu121
-#       torchvision==0.18.0+cu121
-#   They are provided on PyTorch’s CUDA wheel index.
-torch==2.3.0+cu121
-torchvision==0.18.0+cu121
-torchaudio==2.3.0+cu121
---extra-index-url https://download.pytorch.org/whl/cu121
-
-
 ###########
 # Imaging #
 ###########
 pillow==10.3.0
 numpy==1.26.4
-
 
 #########################
 # Lightweight Data I/O  #

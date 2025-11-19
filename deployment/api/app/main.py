@@ -47,8 +47,7 @@ from app.models.victorio import build_victorio
 app = FastAPI(
     title="CXR Inference API",
     version="1.0.0",
-    description="Serves chest X-ray classification models trained in the Jupyter "
-                "notebooks of the project."
+    description="Serves chest X-ray classification models trained in the Jupyter notebooks of the project."
 )
 
 
@@ -57,7 +56,10 @@ app = FastAPI(
 ############################################################
 # This path will be mounted by Podman:
 #   -v $(pwd)/experiments/checkpoints/model.pt:app/model/model.pt:ro
-MODEL_PATH = Path("/app/model/model.pt")
+#  Allow container to start even if /app/model is empty (e.g. during debugging)
+model_files = list(Path("/app/model").glob("*.pt"))
+MODEL_PATH = model_files[0] if model_files else None
+
 
 def parse_model_filename(ckpt_path: Path):
     """
@@ -151,11 +153,9 @@ def load_config():
     # ---------------------------------------------------
     global ckpt_arch, ckpt_domain
 
-    if MODEL_PATH.exists():
-        # Extract architecture ("mobilenet_v2") and domain ("imagenet" / "cxr")
+    if MODEL_PATH is not None and MODEL_PATH.exists():
         ckpt_arch, ckpt_domain = parse_model_filename(MODEL_PATH)
     else:
-        # No checkpoint means we stay in dummy mode
         ckpt_arch, ckpt_domain = None, None
 
     # ---------------------------------------------------

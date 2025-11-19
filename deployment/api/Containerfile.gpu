@@ -12,8 +12,8 @@
 #########################
 # 1. Base image (CUDA)  #
 #########################
-# Use NVIDIA CUDA runtime with Ubuntu base — stable for PyTorch GPU.
-FROM nvidia/cuda:12.1.1-runtime-ubuntu22.04 AS base
+# CUDA 12.8 – REQUIRED for RTX 5090 (Blackwell)
+FROM docker.io/nvidia/cuda:12.8.0-runtime-ubuntu22.04 AS base
 
 #########################
 # 2. Install OS deps    #
@@ -27,7 +27,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Ensure 'python' points to Python 3
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
 ###########################
@@ -39,25 +38,31 @@ USER appuser
 ENV PATH="/home/appuser/.local/bin:${PATH}"
 
 ##############################
-# 4. Create application dirs #
+# 4. Copy requirements (non-Torch)
 ##############################
-WORKDIR /app
+COPY --chown=appuser:appuser deployment/api/requirements-gpu.txt /app/requirements-gpu.txt
 
 ##############################
-# 5. Copy dependency file    #
+# 5. Copy local PyTorch wheels
 ##############################
-COPY --chown=appuser:appuser requirements-gpu.txt /app/requirements-gpu.txt
+COPY --chown=appuser:appuser deployment/api/wheels/ /app/wheels/
 
 ##################################
-# 6. Install Python dependencies #
+# 6. Install dependencies
 ##################################
-# IMPORTANT — Torch must be GPU-enabled
+
+# 1) Install FastAPI, numpy, pandas, etc.
 RUN pip install --no-cache-dir -r /app/requirements-gpu.txt
+
+# 2) Install PyTorch stack from LOCAL wheels
+RUN pip install --no-cache-dir --no-index --find-links=/app/wheels \
+        torch torchvision torchaudio
 
 #############################
 # 7. Copy API application   #
 #############################
-COPY --chown=appuser:appuser app/ /app/app/
+COPY --chown=appuser:appuser deployment/api/app/ /app/app/
+ENV PYTHONPATH="/app:${PYTHONPATH}"
 
 ###############################
 # 8. Expose port for FastAPI  #
@@ -68,3 +73,4 @@ EXPOSE 8000
 # 9. Entrypoint                                            #
 ###########################################################
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+

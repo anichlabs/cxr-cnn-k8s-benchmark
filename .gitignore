@@ -4,6 +4,11 @@
 # Ignore all data files.
 data/
 
-# Ignore all model checkpoints, but keep directory placeholder
+# Ignore all model checkpoints, but keep directory placeholder.
 experiments/checkpoints/*
 !experiments/checkpoints/.gitkeep
+
+# Ignore wheels files used for offline installs.
+deployment/api/wheels/*
+*.whl
+

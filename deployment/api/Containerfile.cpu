@@ -58,7 +58,7 @@ WORKDIR /app
 ##############################
 # 5. Copy dependency file    #
 ##############################
-COPY --chown=appuser:appuser requirements-cpu.txt /app/requirements-cpu.txt
+COPY --chown=appuser:appuser deployment/api/requirements-cpu.txt /app/requirements-cpu.txt
 
 ##################################
 # 6. Install Python dependencies #
@@ -69,7 +69,7 @@ RUN pip install --no-cache-dir -r /app/requirements-cpu.txt
 #############################
 # 7. Copy API application   #
 #############################
-COPY --chown=appuser:appuser app/ /app/app/
+COPY --chown=appuser:appuser deployment/api/app/ /app/app/
 
 ###########################################################
 # IMPORTANT: NOTE FOR LATER (DO NOT FORGET)
