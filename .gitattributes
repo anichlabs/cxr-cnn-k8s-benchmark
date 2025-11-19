@@ -1,0 +1,85 @@
+###############################################################################
+# 1. Line ending normalization
+###############################################################################
+
+# Normalize all text files to LF
+* text=auto eol=lf
+
+# Ensure shell scripts always have LF
+*.sh text eol=lf
+
+# Ensure Python scripts always use LF
+*.py text eol=lf
+
+
+###############################################################################
+# 2. Mark binary files so Git never attempts to diff/merge them
+###############################################################################
+
+# Images
+*.png binary
+*.jpg binary
+*.jpeg binary
+
+# PyTorch models and checkpoints
+*.pt binary
+*.pth binary
+
+# NumPy binary data
+*.npy binary
+*.npz binary
+
+# TorchScript / ONNX
+*.onnx binary
+*.ts binary
+
+# Compiled wheels (binary packages)
+*.whl binary
+
+# Pickle data
+*.pkl binary
+
+
+###############################################################################
+# 3. Jupyter Notebook handling
+###############################################################################
+
+# Notebooks are JSON but huge; do not try to diff them
+*.ipynb merge=union
+*.ipynb diff=none
+*.ipynb text
+
+
+###############################################################################
+# 4. Git LFS rules (inactive unless LFS is installed)
+# You can enable these in the future if the repo grows > 500MB.
+###############################################################################
+
+# Model weights (optional future use)
+# *.pt filter=lfs diff=lfs merge=lfs
+
+
+###############################################################################
+# 5. Docker / container configuration files
+###############################################################################
+
+Dockerfile text
+Containerfile text
+*.dockerignore text
+
+
+###############################################################################
+# 6. JSON / YAML configuration files (kept as text)
+###############################################################################
+
+*.json text
+*.yaml text
+*.yml  text
+
+
+###############################################################################
+# 7. Logs and analysis files
+###############################################################################
+
+*.log text
+*.csv text
