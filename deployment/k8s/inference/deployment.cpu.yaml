@@ -37,3 +37,15 @@ spec:
         env:
           - name: MODEL_TYPE
             value: "cpu"
+
+        volumeMounts:
+          - name: preprocessing-config
+            mountPath: /app/config/preprocessing_config.json
+            subPath: preprocessing_config.json
+
+      volumes:
+        - name: preprocessing-config
+          configMap:
+            name: preprocessing-config
+
+
