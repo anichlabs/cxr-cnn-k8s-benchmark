@@ -1,4 +1,3 @@
-````markdown
 # Comparing Custom and Transfer-Learning CNN Models for Chest X-ray Classification  
 ### Evaluating Performance and Scalability with Kubernetes Orchestration
 
@@ -228,7 +227,7 @@ The core experimental pipeline can be reproduced on a machine with sufficient CP
    ```bash
    conda env create -f environment.yaml
    conda activate msc-cxr
-````
+   
 
 2. Verify that key libraries (PyTorch, torchvision, etc.) import correctly by running:
 
