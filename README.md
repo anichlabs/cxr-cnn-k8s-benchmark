@@ -16,80 +16,90 @@ The deployment and MLOps components exist to support the analytics story: they p
 
 ## 1. Repository structure
 
-High-level layout:
+```text
 
-* `00_setup_project.ipynb`  
-  Initial environment checks, path configuration and basic sanity tests.
+## Directory Layout
 
-* `notebooks/`  
-  * `01_data_eda.ipynb`  
-    Exploratory data analysis for CheXpert_small and TBX11K.
-  * `02_training_baseline.ipynb`  
-    Baseline models and first training experiments.
-  * `03_model_training.ipynb`  
-    Final training runs for all CNNs with consistent configuration.
-  * `04_evaluation_results.ipynb`  
-    Test-set evaluation, cross-model comparison and tables for the report.
-  * `05_explainability.ipynb`  
-    Grad-CAM, LIME and Agreement Index (IoU) between both methods.
-  * `06_deployment_metrics.ipynb`  
-    CPU versus GPU inference latency using the deployed FastAPI service on Kubernetes.
-
-* `src/`  
-  * `dataset.py`  
-    Dataset classes and loaders for CheXpert_small and TBX11K.
-  * `transforms.py`  
-    Centralised image preprocessing (resize, cropping, normalisation) used across notebooks and deployment.
-  * `loaders.py`  
-    High-level dataloader helpers for training, validation and test splits.
-
-* `experiments/`  
-  * `checkpoints/`  
-    Trained model weights  
-    * `mobilenet_v2_*_best.pt`  
-    * `efficientnet_b0_*_best.pt`  
-    * `resnet50_*_best.pt`  
-    * `victorio_*_best.pt`
-  * `pools/`  
-    * `preprocessing_config.json` (image size, normalisation, class map)  
-    * `source_pool_rel.csv`, `test_split.csv`
-  * `results/`  
-    Per-model metrics exported as JSON.
-  * `tables/`  
-    * `agreement_index.csv` (Grad-CAM versus LIME IoU results)
-
-* `deployment/`  
-  * `api/`  
-    * `app/main.py`  
-      FastAPI inference service (CPU and GPU aware, model loading, `/predict`, `/health`, `/metadata`).  
-    * `app/models/victorio.py`  
-      Implementation of the custom Victorio CNN.  
-    * `Containerfile.cpu` / `Containerfile.gpu`  
-      Podman container definitions for CPU and GPU images.  
-  * `k8s/inference/`  
-    * `deployment.cpu.yaml`  
-    * `deployment.gpu.yaml`  
-    * `service.cpu.yaml`  
-    * `service.gpu.yaml`  
-    * `block-gpu-in-default.yaml` (resource quota to prevent other pods consuming the GPU)  
-    * `config/preprocessing_config.json` (mounted into the inference containers)
-
-* `reports/`  
-  * `figures/`  
-    Confusion matrices, accuracy plots, and other figures used in the written thesis.  
-  * `tables/`  
-    * `cross_model_summary.csv`  
-    * `test_evaluation_summary.(csv|json)`  
-    * `k8s_operational_metrics.(csv|json)`
-  * `thesis/`  
-    Source documents related to the research proposal and ethics approval.
-
-* `environment.yaml`  
-  Conda environment specification for the main Python environment.
-
-* `README.md`  
-  This file.
-
+msc-sept-24-ft-cohort-capstone-chrisanich/
+├── 00_setup_project.ipynb
+├── data/
+│   ├── chexpert/
+│   │   ├── train/
+│   │   ├── valid/
+│   │   └── *.csv
+│   └── tbx11k/
+│       ├── annotations/
+│       ├── imgs/
+│       ├── lists/
+│       └── TBX11K_CVPR2020.pdf
+├── deployment/
+│   ├── api/
+│   │   ├── app/
+│   │   │   ├── __init__.py
+│   │   │   ├── main.py
+│   │   │   └── models/
+│   │   │       └── victorio.py
+│   │   ├── Containerfile.cpu
+│   │   ├── Containerfile.gpu
+│   │   ├── requirements-cpu.txt
+│   │   ├── requirements-gpu.txt
+│   │   └── wheels/
+│   └── k8s/
+│       └── inference/
+│           ├── deployment.cpu.yaml
+│           ├── deployment.gpu.yaml
+│           ├── service.cpu.yaml
+│           ├── service.gpu.yaml
+│           ├── block-gpu-in-default.yaml
+│           └── config/
+│               └── preprocessing_config.json
+├── environment.yaml
+├── experiments/
+│   ├── checkpoints/
+│   │   ├── mobilenet_v2_*.pt
+│   │   ├── efficientnet_b0_*.pt
+│   │   ├── resnet50_*.pt
+│   │   └── victorio_*.pt
+│   ├── pools/
+│   │   ├── preprocessing_config.json
+│   │   ├── source_pool_rel.csv
+│   │   └── test_split.csv
+│   ├── results/
+│   │   ├── *_metrics.json
+│   │   └── cross_model_summary.json
+│   └── tables/
+│       └── agreement_index.csv
+├── notebooks/
+│   ├── 01_data_eda.ipynb
+│   ├── 02_training_baseline.ipynb
+│   ├── 03_model_training.ipynb
+│   ├── 04_evaluation_results.ipynb
+│   ├── 05_explainability.ipynb
+│   └── 06_deployment_metrics.ipynb
+├── README.md
+├── reports/
+│   ├── figures/
+│   │   ├── confusion_matrix_*.png
+│   │   ├── cross_model_comparison_train_val.png
+│   │   ├── test_accuracy_all_models.png
+│   │   └── explainability/
+│   ├── tables/
+│   │   ├── cross_model_summary.csv
+│   │   ├── test_evaluation_summary.csv
+│   │   ├── test_evaluation_summary.json
+│   │   ├── k8s_operational_metrics.csv
+│   │   └── k8s_operational_metrics.json
+│   └── thesis/
+│       ├── CCT Ethics Approval Application v3.*
+│       ├── CCTP517 IP created by students.*
+│       └── Research Proposal.*
+├── src/
+│   ├── __init__.py
+│   ├── dataset.py
+│   ├── loaders.py
+│   └── transforms.py
+└── terminal_commands.md
+```
 
 ## 2. Data and problem setting
 
