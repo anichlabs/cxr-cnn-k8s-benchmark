@@ -7,7 +7,7 @@ metadata:
     app: cxr-inference-cpu
 
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: cxr-inference-cpu
@@ -18,22 +18,14 @@ spec:
         app: cxr-inference-cpu
 
     spec:
-      nodeSelector:
-        type: "cpu"
-
       containers:
       - name: inference-cpu
         image: localhost/cxr-cpu:latest
         imagePullPolicy: IfNotPresent
+
         ports:
           - containerPort: 8000
-        resources:
-          requests:
-            cpu: "1000m"
-            memory: "2Gi"
-          limits:
-            cpu: "2000m"
-            memory: "4Gi"
+
         env:
           - name: MODEL_TYPE
             value: "cpu"
@@ -43,9 +35,29 @@ spec:
             mountPath: /app/config/preprocessing_config.json
             subPath: preprocessing_config.json
 
+          - name: model-volume
+            mountPath: /app/model/victorio_cxr_best.pt
+
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 3
+          periodSeconds: 5
+
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+
       volumes:
         - name: preprocessing-config
           configMap:
             name: preprocessing-config
 
-
+        - name: model-volume
+          hostPath:
+            path: /var/tmp/victorio_cxr_best.pt
+            type: File
