@@ -1,0 +1,4 @@
+# Example Minikube configuration using Docker runtime with GPU support
+driver: docker
+container-runtime: docker
+gpus: all
