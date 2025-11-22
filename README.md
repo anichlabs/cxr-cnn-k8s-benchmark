@@ -3,10 +3,10 @@
 
 This repository contains the full code and experimental artefacts for a chest X-ray (CXR) classification project that compares a custom CNN (Victorio) against transfer-learning baselines (MobileNetV2, EfficientNet-B0, ResNet-50).  
 
-The core focus is data analytics:
+Data Analytics:
 
 * systematic comparison of architectures and initialisation domains (ImageNet versus CXR)
-* rigorous evaluation on held-out test sets (CheXpert_small and TBX11K)
+* evaluation on held-out test sets (CheXpert_small and TBX11K)
 * explainability analysis with Grad-CAM and LIME, including an Agreement Index (IoU)
 * basic operational metrics under deployment (CPU versus GPU latency in Kubernetes)
 
