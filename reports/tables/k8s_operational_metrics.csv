@@ -1,0 +1,3 @@
+backend,device_reported,architecture,domain,mean_latency_s,std_latency_s,n_samples,timestamp
+cpu,cpu,victorio,cxr,0.10903696280038275,0.013098652768367669,5,2025-11-22T14:20:30
+gpu,cuda,victorio,cxr,0.10954466180010058,0.07496809417149591,5,2025-11-22T14:20:30

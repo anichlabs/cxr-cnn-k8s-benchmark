@@ -1,0 +1,22 @@
+[
+  {
+    "backend":"cpu",
+    "device_reported":"cpu",
+    "architecture":"victorio",
+    "domain":"cxr",
+    "mean_latency_s":0.1090369628,
+    "std_latency_s":0.0130986528,
+    "n_samples":5,
+    "timestamp":"2025-11-22T14:20:30"
+  },
+  {
+    "backend":"gpu",
+    "device_reported":"cuda",
+    "architecture":"victorio",
+    "domain":"cxr",
+    "mean_latency_s":0.1095446618,
+    "std_latency_s":0.0749680942,
+    "n_samples":5,
+    "timestamp":"2025-11-22T14:20:30"
+  }
+]

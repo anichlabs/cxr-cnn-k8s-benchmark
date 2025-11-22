@@ -18,25 +18,13 @@ spec:
         app: cxr-inference-gpu
 
     spec:
-      nodeSelector:
-        type: "gpu"
-
       containers:
       - name: inference-gpu
-        image: localhost:5000/cxr-gpu:latest
+        image: localhost/cxr-gpu:latest
         imagePullPolicy: IfNotPresent
 
         ports:
           - containerPort: 8000
-
-        resources:
-          limits:
-            cpu: "4000m"
-            memory: "16Gi"
-          requests:
-            nvidia.com/gpu: 1
-            cpu: "2000m"
-            memory: "8Gi"
 
         env:
           - name: MODEL_TYPE
@@ -47,7 +35,38 @@ spec:
             mountPath: /app/config/preprocessing_config.json
             subPath: preprocessing_config.json
 
+          - name: model-volume
+            mountPath: /app/model/victorio_cxr_best.pt
+
+        resources:
+          requests:
+            cpu: "1000m"
+            memory: "3Gi"
+          limits:
+            cpu: "2000m"
+            memory: "6Gi"
+            nvidia.com/gpu: 1
+
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 3
+          periodSeconds: 5
+
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+
       volumes:
         - name: preprocessing-config
           configMap:
             name: preprocessing-config
+
+        - name: model-volume
+          hostPath:
+            path: /var/tmp/victorio_cxr_best.pt
+            type: File

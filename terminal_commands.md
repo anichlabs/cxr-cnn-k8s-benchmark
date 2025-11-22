@@ -1,6 +1,6 @@
 terminal_commands.md:
 
-## Terminal Commands for Building and Testing the Inference Containers
+## Terminal Commands for Building and Testing the Inference Containers.
 
 This document lists all terminal commands required to build, validate and run the CPU and GPU inference containers for the chest X-ray classification system. These commands reproduce the deployment layer described in Notebook 06 and allow verification of model loading, API operation and inference behaviour under both execution modes.
 

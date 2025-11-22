@@ -7,36 +7,49 @@ This repository is organised to ensure modularity, reproducibility, and clarity 
 
 ## Directory Layout
 
-thesis-project/
-│
-├── data/                # Raw datasets (CheXpert_small, TBX11K) – untouched
-│   ├── chexpert/        
+msc-sept-24-ft-cohort-capstone-chrisanich/
+├── 00_setup_project.ipynb
+├── data/
+│   ├── chexpert/
 │   └── tbx11k/
-│
-├── notebooks/           # Jupyter notebooks (EDA, sanity checks, plots for thesis)
+├── deployment/
+│   ├── api/
+│   │   ├── app/
+│   │   ├── Containerfile.cpu
+│   │   ├── Containerfile.gpu
+│   │   ├── requirements-cpu.txt
+│   │   ├── requirements-gpu.txt
+│   │   └── wheels/
+│   ├── k8s/
+│   │   └── inference/
+│   │       ├── deployment.cpu.yaml
+│   │       ├── deployment.gpu.yaml
+│   │       ├── service.cpu.yaml
+│   │       ├── service.gpu.yaml
+│   │       ├── block-gpu-in-default.yaml
+│   │       └── config/preprocessing_config.json
+│   └── minikube/
+│       ├── import_podman_images.txt
+│       └── scripts/
+│           └── start.sh  (optional)
+├── environment.yaml
+├── experiments/
+│   ├── checkpoints/
+│   ├── pools/
+│   ├── results/
+│   └── tables/
+├── notebooks/
 │   ├── 01_data_eda.ipynb
 │   ├── 02_training_baseline.ipynb
-│   └── 03_explainability.ipynb
-│
-├── src/                 # Reusable, modular code
-│   ├── datasets/        # PyTorch Dataset & transforms
-│   ├── models/          # Custom CNN + baselines (MobileNetV2, EfficientNet, ResNet)
-│   ├── training/        # Training loops, evaluation metrics
-│   ├── explainability/  # Grad-CAM utilities
-│   └── utils/           # Configs, logging, helpers
-│
-├── experiments/         # Configs + results for each experiment
-│   ├── exp1_customcnn.yaml
-│   ├── exp2_mobilenet.yaml
-│   └── logs/
-│
-├── reports/             # Outputs for thesis writing
-│   ├── figures/         # ROC curves, confusion matrices, Grad-CAM heatmaps
-│   ├── tables/          # Metrics, statistical tests
-│   └── thesis/          # Draft sections
-│
-├── environment.yml      # Conda environment specification
-└── README.md            # Documentation
+│   ├── 03_model_training.ipynb
+│   ├── 04_evaluation_results.ipynb
+│   ├── 05_explainability.ipynb
+│   └── 06_deployment_metrics.ipynb
+├── README.md
+├── reports/
+├── src/
+└── terminal_commands.md
+
 ```
 
 ### Exact environment (works best on NVIDIA GPUs with CUDA 12.8+)
