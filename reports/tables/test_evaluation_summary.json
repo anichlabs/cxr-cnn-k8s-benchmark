@@ -6,24 +6,24 @@
     "precision": 0.9984887759597553,
     "recall": 0.9984887759597553,
     "f1_score": 0.9984887759597553,
-    "auroc": 0.9999950244944502
+    "auroc": 0.9999966829963002
   },
   "efficientnet_b0_imagenet_best": {
     "model": "efficientnet_b0",
     "normalisation": "ImageNet",
-    "accuracy": 0.9977827050997783,
-    "precision": 0.9976936025211605,
-    "recall": 0.9977750000853799,
-    "f1_score": 0.9977334455085726,
-    "auroc": 0.9998005645135443
+    "accuracy": 0.9985218033998522,
+    "precision": 0.9984887759597553,
+    "recall": 0.9984887759597553,
+    "f1_score": 0.9984887759597553,
+    "auroc": 0.9999063716472327
   },
   "mobilenet_v2_cxr_best": {
     "model": "mobilenet_v2",
     "normalisation": "CXR",
-    "accuracy": 1.0,
-    "precision": 1.0,
-    "recall": 1.0,
-    "f1_score": 1.0,
+    "accuracy": 0.9977827050997783,
+    "precision": 0.9976247030878861,
+    "recall": 0.9978586723768736,
+    "f1_score": 0.9977339910307013,
     "auroc": 1.0
   },
   "mobilenet_v2_imagenet_best": {
@@ -33,7 +33,7 @@
     "precision": 0.9992044550517104,
     "recall": 0.9992862241256245,
     "f1_score": 0.9992444818361909,
-    "auroc": 0.9999966829963002
+    "auroc": 0.9993437059637061
   },
   "resnet50_cxr_best": {
     "model": "resnet50",
@@ -42,7 +42,7 @@
     "precision": 0.9992044550517104,
     "recall": 0.9992862241256245,
     "f1_score": 0.9992444818361909,
-    "auroc": 1.0
+    "auroc": 0.9996527194683237
   },
   "resnet50_imagenet_best": {
     "model": "resnet50",
@@ -51,24 +51,24 @@
     "precision": 0.9992044550517104,
     "recall": 0.9992862241256245,
     "f1_score": 0.9992444818361909,
-    "auroc": 0.9989536007198918
+    "auroc": 0.99999834149815
   },
   "victorio_cxr_best": {
     "model": "victorio",
     "normalisation": "CXR",
-    "accuracy": 0.9216555801921655,
-    "precision": 0.9209033510822406,
-    "recall": 0.9216698697990257,
-    "f1_score": 0.9204116838837852,
-    "auroc": 0.9800246116416073
+    "accuracy": 0.9238728750923872,
+    "precision": 0.922642661658459,
+    "recall": 0.923476508256177,
+    "f1_score": 0.922654892422531,
+    "auroc": 0.9818401338264993
   },
   "victorio_imagenet_best": {
     "model": "victorio",
     "normalisation": "ImageNet",
-    "accuracy": 0.9083518107908352,
-    "precision": 0.9074702541693261,
-    "recall": 0.9082468741546844,
-    "f1_score": 0.9071606942866373,
-    "auroc": 0.9778905004547545
+    "accuracy": 0.9186991869918699,
+    "precision": 0.9173392388107784,
+    "recall": 0.9181469131316984,
+    "f1_score": 0.9174382344427809,
+    "auroc": 0.980747990052142
   }
 }

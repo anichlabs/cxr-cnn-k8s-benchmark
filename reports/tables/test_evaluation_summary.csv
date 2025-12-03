@@ -1,9 +1,9 @@
 name,model,normalisation,accuracy,precision,recall,f1_score,auroc
-efficientnet_b0_cxr_best,efficientnet_b0,CXR,0.998522,0.998489,0.998489,0.998489,0.999995
-efficientnet_b0_imagenet_best,efficientnet_b0,ImageNet,0.997783,0.997694,0.997775,0.997733,0.999801
-mobilenet_v2_cxr_best,mobilenet_v2,CXR,1.000000,1.000000,1.000000,1.000000,1.000000
-mobilenet_v2_imagenet_best,mobilenet_v2,ImageNet,0.999261,0.999204,0.999286,0.999244,0.999997
-resnet50_cxr_best,resnet50,CXR,0.999261,0.999204,0.999286,0.999244,1.000000
-resnet50_imagenet_best,resnet50,ImageNet,0.999261,0.999204,0.999286,0.999244,0.998954
-victorio_cxr_best,victorio,CXR,0.921656,0.920903,0.921670,0.920412,0.980025
-victorio_imagenet_best,victorio,ImageNet,0.908352,0.907470,0.908247,0.907161,0.977891
+efficientnet_b0_cxr_best,efficientnet_b0,CXR,0.998522,0.998489,0.998489,0.998489,0.999997
+efficientnet_b0_imagenet_best,efficientnet_b0,ImageNet,0.998522,0.998489,0.998489,0.998489,0.999906
+mobilenet_v2_cxr_best,mobilenet_v2,CXR,0.997783,0.997625,0.997859,0.997734,1.000000
+mobilenet_v2_imagenet_best,mobilenet_v2,ImageNet,0.999261,0.999204,0.999286,0.999244,0.999344
+resnet50_cxr_best,resnet50,CXR,0.999261,0.999204,0.999286,0.999244,0.999653
+resnet50_imagenet_best,resnet50,ImageNet,0.999261,0.999204,0.999286,0.999244,0.999998
+victorio_cxr_best,victorio,CXR,0.923873,0.922643,0.923477,0.922655,0.981840
+victorio_imagenet_best,victorio,ImageNet,0.918699,0.917339,0.918147,0.917438,0.980748
