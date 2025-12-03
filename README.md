@@ -371,6 +371,3 @@ It is not intended as a clinical tool and must not be used to make any diagnosti
 * CheXpert and TBX11K dataset creators and maintainers.
 * CCT College Dublin for providing the MSc Data Analytics programme context.
 * Open-source libraries and tools used throughout (PyTorch, torchvision, FastAPI, Uvicorn, Podman, Minikube, Kubernetes and others).
-
-```
-```
