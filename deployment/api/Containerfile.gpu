@@ -62,6 +62,10 @@ RUN pip install --no-cache-dir --no-index --find-links=/app/wheels \
 # 7. Copy API application   #
 #############################
 COPY --chown=appuser:appuser deployment/api/app/ /app/app/
+
+# Copy shared project code needed by the API (shared transforms).
+COPY --chown=appuser:appuser src/ /app/src/
+
 ENV PYTHONPATH="/app:${PYTHONPATH}"
 
 ###############################

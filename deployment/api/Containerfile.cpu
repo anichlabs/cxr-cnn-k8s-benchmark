@@ -70,6 +70,7 @@ RUN pip install --no-cache-dir -r /app/requirements-cpu.txt
 # 7. Copy API application   #
 #############################
 COPY --chown=appuser:appuser deployment/api/app/ /app/app/
+COPY --chown=appuser:appuser src/ /app/src/
 
 ###########################################################
 # IMPORTANT: NOTE FOR LATER (DO NOT FORGET)

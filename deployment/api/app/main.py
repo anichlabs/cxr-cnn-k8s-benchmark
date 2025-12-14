@@ -31,7 +31,10 @@ from torchvision import transforms
 from torchvision.transforms import InterpolationMode
 import torch
 import json
-from app.models.victorio import build_victorio
+from deployment.api.app.models.victorio import build_victorio
+
+# This pulls the shared preprocessing builder from src/transforms.py.
+from src.transforms import build_shared_transforms
 
 ###########################################################
 # 1. Create the FastAPI application instance              #
@@ -280,12 +283,14 @@ async def predict(file: UploadFile = File(...)):
     # This MUST match:
     # - notebooks 02, 03, 04
     # - src/transforms.py logic
-    tfm = transforms.Compose([
-        transforms.Resize(img_size),
-        transforms.CenterCrop(img_size),
-        transforms.ToTensor(),
-        transforms.Normalize(mean, std)
-    ])
+    # Build evaluation transforms from the shared transform builder.
+    # Use cfg["transform_mode"] so the API matches the persisted config.
+    _, tfm = build_shared_transforms(
+        img_size=img_size,
+        mean=mean,
+        std=std,
+        transform_mode=cfg.get("transform_mode", "center-crop")
+    )
 
     # Apply transforms and add batch dimension
     x = tfm(img).unsqueeze(0)

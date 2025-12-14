@@ -24,7 +24,7 @@ uvicorn[standard]==0.30.1
 pydantic==2.9.2
 
 # Allows FastAPI to accept file uploads (UploadFile) in /predict.
-python-multipart==0.0.9
+python-multipart==0.0.20
 
 
 ####################
