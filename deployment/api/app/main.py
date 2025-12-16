@@ -31,7 +31,9 @@ from torchvision import transforms
 from torchvision.transforms import InterpolationMode
 import torch
 import json
-from deployment.api.app.models.victorio import build_victorio
+from app.models.victorio import build_victorio
+from app.metrics import router as metrics_router
+
 
 # This pulls the shared preprocessing builder from src/transforms.py.
 from src.transforms import build_shared_transforms
@@ -53,6 +55,7 @@ app = FastAPI(
     description="Serves chest X-ray classification models trained in the Jupyter notebooks of the project."
 )
 
+app.include_router(metrics_router)
 
 ############################################################
 # 2. Model checkpoint path and architecture inference      #

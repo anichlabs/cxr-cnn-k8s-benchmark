@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: inference-gpu
-        image: localhost/cxr-gpu:latest
+        image: cxr-api:gpu
         imagePullPolicy: IfNotPresent
 
         ports:

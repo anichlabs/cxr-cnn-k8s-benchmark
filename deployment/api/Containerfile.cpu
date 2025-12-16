@@ -49,11 +49,23 @@ ENV PATH="/home/appuser/.local/bin:${PATH}"
 ##############################
 WORKDIR /app
 
+# Make /app the Python import root.
+# This ensures that:
+#   - `app.*` imports resolve correctly
+#   - `src.*` imports resolve correctly
+# without relying on implicit working-directory behaviour.
+#
+# This matches how Python was executed during local development
+# when using: PYTHONPATH=. uvicorn ...
+ENV PYTHONPATH="/app:${PYTHONPATH}"
+
 # Directory structure INSIDE the container:
 # /app
 #   ├── app/               <-- FastAPI code
+#   ├── src/               <-- shared transforms (deployment-safe)
 #   ├── config/            <-- preprocessing_config.json (mounted)
 #   └── requirements.txt
+
 
 ##############################
 # 5. Copy dependency file    #

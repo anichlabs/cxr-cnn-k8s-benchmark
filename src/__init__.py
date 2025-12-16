@@ -3,18 +3,8 @@ src package
 -----------
 Reusable components of the project pipeline.
 
-This package centralises the code validated in '/notebooks/02_training_baseline.ipynb':
-- dataset.py    : unified three-class Dataset (CXRThreeClassDataset).
-- transforms.py : shared ImageNet preprocessing pipelines.
-- loaders.py    : stratified DataLoader constructor.
+Important for deployment:
+- Do NOT import training-only dependencies (e.g. sklearn) at package import time.
+- Deployment code should import what it needs directly, e.g.:
+    from src.transforms import build_shared_transforms
 """
-
-from .dataset import CXRThreeClassDataset
-from .transforms import build_shared_transforms
-from .loaders import build_dataloaders
-
-__all__ = [
-    "CXRThreeClassDataset",
-    "build_shared_transforms",
-    "build_dataloaders",
-]

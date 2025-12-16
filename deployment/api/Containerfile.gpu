@@ -38,6 +38,14 @@ USER appuser
 ENV PATH="/home/appuser/.local/bin:${PATH}"
 
 ##############################
+# 4. Create application dirs #
+##############################
+WORKDIR /app
+
+# Make /app the Python import root (matches CPU image)
+ENV PYTHONPATH="/app:${PYTHONPATH}"
+
+##############################
 # 4. Copy requirements (non-Torch)
 ##############################
 COPY --chown=appuser:appuser deployment/api/requirements-gpu.txt /app/requirements-gpu.txt
@@ -65,8 +73,6 @@ COPY --chown=appuser:appuser deployment/api/app/ /app/app/
 
 # Copy shared project code needed by the API (shared transforms).
 COPY --chown=appuser:appuser src/ /app/src/
-
-ENV PYTHONPATH="/app:${PYTHONPATH}"
 
 ###############################
 # 8. Expose port for FastAPI  #
