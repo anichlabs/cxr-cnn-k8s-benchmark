@@ -43,7 +43,7 @@ ENV PATH="/home/appuser/.local/bin:${PATH}"
 WORKDIR /app
 
 # Make /app the Python import root (matches CPU image)
-ENV PYTHONPATH="/app:${PYTHONPATH}"
+ENV PYTHONPATH=/app
 
 ##############################
 # 4. Copy requirements (non-Torch)
@@ -53,18 +53,18 @@ COPY --chown=appuser:appuser deployment/api/requirements-gpu.txt /app/requiremen
 ##############################
 # 5. Copy local PyTorch wheels
 ##############################
-COPY --chown=appuser:appuser deployment/api/wheels/ /app/wheels/
+COPY --chown=appuser:appuser deployment/api/wheels-gpu/ /app/wheels/
 
 ##################################
-# 6. Install dependencies
+# 6. Install dependencies (OFFLINE)
 ##################################
 
-# 1) Install FastAPI, numpy, pandas, etc.
-RUN pip install --no-cache-dir -r /app/requirements-gpu.txt
+# Install ALL deps from local wheels only (no PyPI)
+RUN pip install --no-cache-dir --no-index --find-links=/app/wheels -r /app/requirements-gpu.txt
 
-# 2) Install PyTorch stack from LOCAL wheels
+# Install PyTorch stack from LOCAL CUDA wheels
 RUN pip install --no-cache-dir --no-index --find-links=/app/wheels \
-        torch torchvision torchaudio
+    torch torchvision torchaudio
 
 #############################
 # 7. Copy API application   #

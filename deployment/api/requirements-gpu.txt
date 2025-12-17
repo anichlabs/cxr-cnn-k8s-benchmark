@@ -30,3 +30,6 @@ numpy==1.26.4
 # Lightweight Data I/O  #
 #########################
 pandas==2.2.2
+
+
+prometheus-client==0.21.0

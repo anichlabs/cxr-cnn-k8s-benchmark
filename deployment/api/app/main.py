@@ -24,19 +24,27 @@ This file will later:
 - return predictions to external systems
 """
 
+import time
+import os
+import logging
+from instrumentation import (
+    HTTP_REQUESTS_TOTAL,
+    HTTP_REQUEST_DURATION_SECONDS,
+    INFERENCE_DURATION_SECONDS,
+    PREDICTIONS_TOTAL,
+)
 from fastapi import FastAPI, UploadFile, File
 from pathlib import Path
 from PIL import Image
-from torchvision import transforms
-from torchvision.transforms import InterpolationMode
 import torch
 import json
-from app.models.victorio import build_victorio
-from app.metrics import router as metrics_router
-
+from metrics import router as metrics_router
+from models.victorio import build_victorio
 
 # This pulls the shared preprocessing builder from src/transforms.py.
 from src.transforms import build_shared_transforms
+
+logging.basicConfig(level=logging.DEBUG)
 
 ###########################################################
 # 1. Create the FastAPI application instance              #
@@ -55,17 +63,80 @@ app = FastAPI(
     description="Serves chest X-ray classification models trained in the Jupyter notebooks of the project."
 )
 
+##########################################################
+# Prometheus HTTP metrics middleware                     #
+##########################################################
+# This middleware wraps every incoming HTTP request handled by FastAPI.
+#
+# Why a middleware?
+# -----------------
+# - It runs for ALL endpoints (/health, /predict, /metrics, etc.)
+# - It allows to measure request-level behaviour consistently
+# - It avoids duplicating metrics code inside each route
+#
+# What it measures here:
+# ----------------------
+# 1. Total number of HTTP requests, labelled by:
+#    - HTTP method  (GET, POST, ...)
+#    - URL path     (/health, /predict, ...)
+#    - Status code  (200, 400, 500, ...)
+#
+# 2. End-to-end request latency:
+#    - Time from request arrival to response generation
+#    - Includes FastAPI routing, validation, inference, etc.
+#
+# These metrics are:
+# - Collected automatically
+# - Exposed via /metrics (Prometheus scrape endpoint)
+# - Used later for dashboards and SLOs
+#
+# IMPORTANT:
+# ---------
+# This measures *API-level* latency.
+# Model inference latency is measured separately inside /predict
+# using INFERENCE_DURATION_SECONDS.
+#############################################################
+@app.middleware("http")
+async def prom_middleware(request, call_next):
+    # Start a high-resolution timer as soon as the request enters the app.
+    start = time.perf_counter()
+
+    # Pass the request down the middleware chain and into the route handler.
+    response = await call_next(request)
+
+    # Compute total request duration (seconds).
+    duration = time.perf_counter() - start
+
+    # Extract request metadata used as Prometheus labels.
+    path = request.url.path # e.g. /health, /predict
+    method = request.method # GET, POST, ...
+    status = str(response.status_code)
+
+    # Increment total HTTP request counter.
+    HTTP_REQUESTS_TOTAL.labels(method=method, path=path, status=status).inc()
+
+    # Observe end-to-end request latency (histogram).
+    HTTP_REQUEST_DURATION_SECONDS.labels(method=method, path=path).observe(duration)
+    
+    logging.debug(
+        f"Metrics updated: {method} {path} {status} in {duration:.4f}s"
+    )
+    # Return the original response unchanged.
+    return response
+
 app.include_router(metrics_router)
 
 ############################################################
 # 2. Model checkpoint path and architecture inference      #
 ############################################################
-# This path will be mounted by Podman:
-#   -v $(pwd)/experiments/checkpoints/model.pt:app/model/model.pt:ro
-#  Allow container to start even if /app/model is empty (e.g. during debugging)
-model_files = list(Path("/app/model").glob("*.pt"))
-MODEL_PATH = model_files[0] if model_files else None
-
+# Model checkpoint filename parsing
+#
+# Checkpoints are expected to be mounted into /app/model at runtime
+# (e.g. via Podman, Docker, or Kubernetes volume mounts).
+#
+# This function does NOT load the model.
+# It only infers architecture and training domain from the filename
+# to decide which model class and preprocessing to use later.
 
 def parse_model_filename(ckpt_path: Path):
     """
@@ -112,6 +183,13 @@ def parse_model_filename(ckpt_path: Path):
 # The API loads this ONCE at startup.
 CONFIG_PATH = Path("/app/config/preprocessing_config.json")
 
+MODEL_PATH: Path | None = None
+model = None
+ckpt_arch = None
+ckpt_domain = None
+device = None
+mean = None
+std = None
 
 ############################################################
 # 4. Load configuration when the API starts                #
@@ -129,12 +207,19 @@ def load_config():
     - If they differ even slightly, inference becomes invalid.
     """
 
-    global cfg, img_size
+    global cfg, img_size, MODEL_PATH
+
+    model_files = list(Path("/app/model").glob("*.pt"))
+    MODEL_PATH = model_files[0] if model_files else None
+
     # Parse the config JSON file.
     cfg = json.loads(CONFIG_PATH.read_text())
 
     # Required configuration values.
-    img_size = int(cfg["img_size"]) # For now, ImageNet mode
+    img_size = int(cfg["img_size"]) # Input size used during training.
+    if img_size <= 0:
+        raise ValueError("Invalid img_size in preprocessing_config.json")
+
 
     # No model is loaded yet: that comes in a later step.
 
@@ -305,9 +390,15 @@ async def predict(file: UploadFile = File(...)):
         model.eval()
         x = x.to(device)
 
-        with torch.no_grad():
-            logits = model(x)
-            pred_idx = int(logits.argmax(dim=1).item())
+        model_type = os.getenv("MODEL_TYPE", "cpu")
+
+        with INFERENCE_DURATION_SECONDS.labels(model_type=model_type).time():
+            with torch.no_grad():
+                logits = model(x)
+
+        pred_idx = int(logits.argmax(dim=1).item())
+        PREDICTIONS_TOTAL.labels(model_type=model_type).inc()
+
 
         idx_to_class = {v: k for k, v in cfg["class_to_index"].items()}
         pred_class = idx_to_class[pred_idx]

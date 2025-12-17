@@ -57,7 +57,7 @@ WORKDIR /app
 #
 # This matches how Python was executed during local development
 # when using: PYTHONPATH=. uvicorn ...
-ENV PYTHONPATH="/app:${PYTHONPATH}"
+ENV PYTHONPATH=/app
 
 # Directory structure INSIDE the container:
 # /app
@@ -72,11 +72,14 @@ ENV PYTHONPATH="/app:${PYTHONPATH}"
 ##############################
 COPY --chown=appuser:appuser deployment/api/requirements-cpu.txt /app/requirements-cpu.txt
 
+# 5.5 Copy pre-downloaded CPU wheels (to avoid PyPI timeouts)
+COPY --chown=appuser:appuser deployment/api/wheels-cpu/ /app/wheels/
+
+
 ##################################
 # 6. Install Python dependencies #
 ##################################
-# pip install MUST run in clear environment without cache
-RUN pip install --no-cache-dir -r /app/requirements-cpu.txt
+RUN pip install --no-cache-dir --no-index --find-links=/app/wheels -r /app/requirements-cpu.txt
 
 #############################
 # 7. Copy API application   #

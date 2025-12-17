@@ -34,8 +34,8 @@ python-multipart==0.0.20
 # - reconstruct the model architecture (mobilenet_v2, efficientnet_b0, etc.)
 # - load trained checkpoints (*.pt)
 # - apply training-time transforms (Resize, CenterCrop, Normalise)
-torch==2.2.2
-torchvision==0.17.2
+torch==2.2.2+cpu
+torchvision==0.17.2+cpu
 
 # Pillow is required to load medical images (PIL.Image.open).
 pillow==10.3.0
@@ -52,3 +52,6 @@ numpy==1.26.4
 # It is deliberately kept because the notebooks use pandas for
 # interpreting the same configuration files that the API must reuse.
 pandas==2.2.2
+
+
+prometheus-client==0.21.0
