@@ -1,0 +1,54 @@
+{
+  "available_models": {
+    "mobilenet_v2_cxr": {
+      "architecture": "mobilenet_v2",
+      "checkpoint": "mobilenet_v2_cxr_best.pt",
+      "domain": "cxr",
+      "description": "MobileNetV2 trained on CXR data (perfect accuracy)"
+    },
+    "mobilenet_v2_imagenet": {
+      "architecture": "mobilenet_v2",
+      "checkpoint": "mobilenet_v2_imagenet_best.pt",
+      "domain": "imagenet",
+      "description": "MobileNetV2 with ImageNet pretraining"
+    },
+    "efficientnet_b0_cxr": {
+      "architecture": "efficientnet_b0",
+      "checkpoint": "efficientnet_b0_cxr_best.pt",
+      "domain": "cxr",
+      "description": "EfficientNet-B0 trained on CXR data"
+    },
+    "efficientnet_b0_imagenet": {
+      "architecture": "efficientnet_b0",
+      "checkpoint": "efficientnet_b0_imagenet_best.pt",
+      "domain": "imagenet",
+      "description": "EfficientNet-B0 with ImageNet pretraining"
+    },
+    "resnet50_cxr": {
+      "architecture": "resnet50",
+      "checkpoint": "resnet50_cxr_best.pt",
+      "domain": "cxr",
+      "description": "ResNet-50 trained on CXR data"
+    },
+    "resnet50_imagenet": {
+      "architecture": "resnet50",
+      "checkpoint": "resnet50_imagenet_best.pt",
+      "domain": "imagenet",
+      "description": "ResNet-50 with ImageNet pretraining"
+    },
+    "victorio_cxr": {
+      "architecture": "victorio",
+      "checkpoint": "victorio_cxr_best.pt",
+      "domain": "cxr",
+      "description": "Custom Victorio CNN trained on CXR data"
+    },
+    "victorio_imagenet": {
+      "architecture": "victorio",
+      "checkpoint": "victorio_imagenet_best.pt",
+      "domain": "imagenet",
+      "description": "Custom Victorio CNN with ImageNet pretraining"
+    }
+  },
+  "default_model": "mobilenet_v2_cxr",
+  "checkpoint_base_path": "/app/checkpoints"
+}

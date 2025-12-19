@@ -1,6 +1,5 @@
 ```
-text
-➜  cxr-cnn-k8s-benchmark git:(main) ✗ tree -L 3
+➜  cxr-cnn-k8s-benchmark git:(main) tree -L 3
 .
 ├── 00_setup_project.ipynb
 ├── data
@@ -23,9 +22,11 @@ text
 │   │   ├── Containerfile.gpu
 │   │   ├── requirements-cpu.txt
 │   │   ├── requirements-gpu.txt
-│   │   └── wheels
+│   │   ├── wheels-cpu
+│   │   └── wheels-gpu
 │   └── k8s
 │       └── inference
+├── directory_tree.md
 ├── environment.yaml
 ├── experiments
 │   ├── checkpoints
@@ -165,23 +166,68 @@ text
 │   └── transforms.py
 └── terminal_commands.md
 
-30 directories, 133 files
+31 directories, 134 files
 ➜  cxr-cnn-k8s-benchmark git:(main) ✗ ls
-00_setup_project.ipynb  deployment        experiments  README.md  src
-data                    environment.yaml  notebooks    reports    terminal_commands.md
-➜  cxr-cnn-k8s-benchmark git:(main) ✗ cd deployment 
+00_setup_project.ipynb  directory_tree.md  notebooks  src
+data                    environment.yaml   README.md  terminal_commands.md
+deployment              experiments        reports
+➜  cxr-cnn-k8s-benchmark git:(main) ✗ cd deployment
+➜  deployment git:(main) ✗ ls
+api  k8s
 ➜  deployment git:(main) ✗ tree -L 3
 .
 ├── api
 │   ├── app
 │   │   ├── __init__.py
+│   │   ├── instrumentation.py
 │   │   ├── main.py
-│   │   └── models
+│   │   ├── metrics.py
+│   │   ├── models
+│   │   ├── __pycache__
+│   │   └── routers
 │   ├── Containerfile.cpu
 │   ├── Containerfile.gpu
 │   ├── requirements-cpu.txt
 │   ├── requirements-gpu.txt
-│   └── wheels
+│   ├── wheels-cpu
+│   │   ├── annotated_types-0.7.0-py3-none-any.whl
+│   │   ├── anyio-4.12.0-py3-none-any.whl
+│   │   ├── click-8.3.1-py3-none-any.whl
+│   │   ├── exceptiongroup-1.3.1-py3-none-any.whl
+│   │   ├── fastapi-0.115.0-py3-none-any.whl
+│   │   ├── filelock-3.20.0-py3-none-any.whl
+│   │   ├── filelock-3.20.1-py3-none-any.whl
+│   │   ├── fsspec-2025.12.0-py3-none-any.whl
+│   │   ├── h11-0.16.0-py3-none-any.whl
+│   │   ├── httptools-0.7.1-cp310-cp310-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl
+│   │   ├── idna-3.11-py3-none-any.whl
+│   │   ├── jinja2-3.1.6-py3-none-any.whl
+│   │   ├── markupsafe-3.0.3-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl
+│   │   ├── mpmath-1.3.0-py3-none-any.whl
+│   │   ├── networkx-3.4.2-py3-none-any.whl
+│   │   ├── numpy-1.26.4-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+│   │   ├── pandas-2.2.2-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+│   │   ├── pillow-10.3.0-cp310-cp310-manylinux_2_28_x86_64.whl
+│   │   ├── prometheus_client-0.21.0-py3-none-any.whl
+│   │   ├── pydantic-2.9.2-py3-none-any.whl
+│   │   ├── pydantic_core-2.23.4-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+│   │   ├── python_dateutil-2.9.0.post0-py2.py3-none-any.whl
+│   │   ├── python_dotenv-1.2.1-py3-none-any.whl
+│   │   ├── python_multipart-0.0.20-py3-none-any.whl
+│   │   ├── pytz-2025.2-py2.py3-none-any.whl
+│   │   ├── pyyaml-6.0.3-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl
+│   │   ├── six-1.17.0-py2.py3-none-any.whl
+│   │   ├── starlette-0.38.6-py3-none-any.whl
+│   │   ├── sympy-1.14.0-py3-none-any.whl
+│   │   ├── torch-2.2.2+cpu-cp310-cp310-linux_x86_64.whl
+│   │   ├── torchvision-0.17.2+cpu-cp310-cp310-linux_x86_64.whl
+│   │   ├── typing_extensions-4.15.0-py3-none-any.whl
+│   │   ├── tzdata-2025.3-py2.py3-none-any.whl
+│   │   ├── uvicorn-0.30.1-py3-none-any.whl
+│   │   ├── uvloop-0.22.1-cp310-cp310-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl
+│   │   ├── watchfiles-1.1.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+│   │   └── websockets-15.0.1-cp310-cp310-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+│   └── wheels-gpu
 │       ├── filelock-3.20.0-py3-none-any.whl
 │       ├── fsspec-2025.10.0-py3-none-any.whl
 │       ├── jinja2-3.1.6-py3-none-any.whl
@@ -220,6 +266,6 @@ data                    environment.yaml  notebooks    reports    terminal_comma
         ├── service.cpu.yaml
         └── service.gpu.yaml
 
-8 directories, 40 files
+11 directories, 79 files
 ➜  deployment git:(main) ✗ 
 ```
