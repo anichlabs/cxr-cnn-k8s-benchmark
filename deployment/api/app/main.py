@@ -192,7 +192,104 @@ mean = None
 std = None
 
 ############################################################
-# 4. Load configuration when the API starts                #
+# 4. Lazy loading. Load on-demand per request              #
+############################################################
+# Load on-demand per request:
+# - Lower memory cost (only one model in RAM at a time)
+# - Slower first request (model loads from disk)
+# - Can swap models without restarting
+def load_model_from_config(model_name: str, device: torch.device):
+    """
+    Load a model checkpoint on-demand based on the model name in models_config.json
+
+    Args:
+        model_name: The key from models_config.json (e.g., "mobilenet_v2_cxr")
+        device: torch.device (cpu or cuda)
+
+    Returns:
+        (model, metadata_dict) where metadata contains architecture, domain, checkpoint_path
+
+    Raises:
+         ValueError if model_name not found in config
+    """
+
+    # Load config file
+    config_path = Path("/app/config/models_config.json")
+    config = json.loads(config_path.read_text())
+
+    # Look up model in available_models
+    if model_name not in config["available_models"]:
+        raise ValueError(f"Model '{model_name}' not found in config. Available: {list(config['available_models'].keys())}")
+
+    model_info = config["available_models"][model_name]
+
+    # Build full path to checkpoint
+    checkpoint_filename = model_info["checkpoint"]
+    checkpoint_base = config["checkpoint_base_path"]
+    checkpoint_path = Path(checkpoint_base) / checkpoint_filename
+
+    # Verify checkpoint exists
+    if not checkpoint_path.exists():
+        raise ValueError(f"Checkpoint not found: {checkpoint_path}")
+
+    # Load preprocessing config to know num_classes
+    preprocessing_config = json.loads(Path("/app/config/preprocessing_config.json").read_text())
+    num_classes = len(preprocessing_config["class_to_index"])
+
+    # Build model architectire based on config
+    architecture = model_info["architecture"]
+
+    # Instantiate the correct model architecture
+    # Note: weights=None means you start with random weights
+    # Load the trained weights from the checkpoint file below
+    if architecture == "mobilenet_v2":
+        from torchvision.models import mobilenet_v2
+        model = mobilenet_v2(weights=None)
+        # Replace the final classification later to match our num_classes
+        model.classifier[-1] = torch.nn.Linear(model.classifier[-1].in_features, num_classes)
+
+    elif architecture == "efficientnet_b0":
+        from torchvision.models import efficientnet_b0
+        model = efficientnet_b0(weights=None)
+        # EfficientNet's classifier is a Sequential with th linear layer at index 1
+        model.classifier[1] = torch.nn.Linear(model.classifier[1].in_features, num_classes)
+
+    elif architecture == "resnet50":
+        from torchvision.models import resnet50
+        model = resnet50(weights=None)
+        # ResNet uses model.fc for the final fully connected layer
+        model.fc = torch.nn.Linear(model.fc.in_features, num_classes)
+
+    elif architecture == "victorio":
+        from src.models.victorio import build_victorio
+        model = build_victorio(num_classes)
+
+    else:
+        raise ValueError(f'Unknown architecture: {architecture}')
+
+    # Load the trained weights from disk
+    # map_location=device ensures we load to the right device (CPU or GPU)
+    state_dict = torch.load(checkpoint_path, map_location=device)
+    model.load_state_dict(state_dict)
+
+    # Move model to the correct device and set to evaluation mode
+    # eval() disables dropout and batch normalisation training behaviour
+    model.to(device)
+    model.eval()
+
+    # Return the loaded model and metadata about what was loaded
+    metadata = {
+        "model_name": model_name,
+        "architecture": architecture,
+        "domain": model_info["domain"],
+        "checkpoint_path": str(checkpoint_path),
+        "num_classes": num_classes
+    }
+
+    return model, metadata
+
+############################################################
+# 5. Load configuration when the API starts                #
 ############################################################
 @app.on_event("startup")
 def load_config():
@@ -240,7 +337,7 @@ def load_config():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # ---------------------------------------------------
-    # 4. Detect checkpoint if mounted into the container
+    # 2. Detect checkpoint if mounted into the container
     # ---------------------------------------------------
     global ckpt_arch, ckpt_domain
 
@@ -250,7 +347,7 @@ def load_config():
         ckpt_arch, ckpt_domain = None, None
 
     # ---------------------------------------------------
-    # 5. Adjust normalisation based on domain
+    # 3. Adjust normalisation based on domain
     # ---------------------------------------------------
     global mean, std
 
@@ -264,7 +361,7 @@ def load_config():
         std  = cfg["cxr_std"]
 
     # -------------------------------------------------------
-    # 6. Build model architecture if a checkpoint is present
+    # 4. Build model architecture if a checkpoint is present
     # -------------------------------------------------------
     global model
 
@@ -296,7 +393,7 @@ def load_config():
         raise ValueError(f"Unknown architecture: {ckpt_arch}")
 
     # ------------------------------------------
-    # 7. Load weights and move model to device
+    # 5. Load weights and move model to device
     # ------------------------------------------
     state_dict = torch.load(MODEL_PATH, map_location=device)
     model.load_state_dict(state_dict)
@@ -304,7 +401,7 @@ def load_config():
     model.eval() # important for dropout/batchnorm
 
 ###########################################################
-# 5. Health endpoint                                      #
+# 6. Health endpoint                                      #
 ###########################################################
 @app.get("/health")
 def health():
@@ -323,7 +420,7 @@ def health():
 
 
 ###########################################################
-# 6. Metadata endpoint                                    #
+# 7. Metadata endpoint                                    #
 ###########################################################
 @app.get("/metadata")
 def metadata():
@@ -340,7 +437,7 @@ def metadata():
 
 
 ###########################################################
-# 7. Prediction endpoint                                  #
+# 8. Prediction endpoint                                  #
 ###########################################################
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
