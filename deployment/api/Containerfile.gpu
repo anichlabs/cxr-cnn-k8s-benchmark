@@ -73,6 +73,7 @@ COPY --chown=appuser:appuser deployment/api/app/ /app/app/
 
 # Copy shared project code needed by the API (shared transforms).
 COPY --chown=appuser:appuser src/ /app/src/
+COPY --chown=appuser:appuser deployment/api/config/ /app/config/
 
 ###############################
 # 8. Expose port for FastAPI  #

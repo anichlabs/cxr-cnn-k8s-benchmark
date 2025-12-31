@@ -86,6 +86,7 @@ RUN pip install --no-cache-dir --no-index --find-links=/app/wheels -r /app/requi
 #############################
 COPY --chown=appuser:appuser deployment/api/app/ /app/app/
 COPY --chown=appuser:appuser src/ /app/src/
+COPY --chown=appuser:appuser deployment/api/config/ /app/config/
 
 ###########################################################
 # IMPORTANT: NOTE FOR LATER (DO NOT FORGET)

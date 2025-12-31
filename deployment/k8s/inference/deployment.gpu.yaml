@@ -31,12 +31,8 @@ spec:
             value: "gpu"
 
         volumeMounts:
-          - name: preprocessing-config
-            mountPath: /app/config/preprocessing_config.json
-            subPath: preprocessing_config.json
-
-          - name: model-volume
-            mountPath: /app/model/victorio_cxr_best.pt
+          - name: checkpoints-volume
+            mountPath: /app/checkpoints
 
         resources:
           requests:
@@ -62,11 +58,9 @@ spec:
           periodSeconds: 10
 
       volumes:
-        - name: preprocessing-config
-          configMap:
-            name: preprocessing-config
-
-        - name: model-volume
+        - name: checkpoints-volume
           hostPath:
-            path: /var/tmp/victorio_cxr_best.pt
-            type: File
+            # Replace /lab/px/AnichLabs/cxr-cnn-k8s-benchmark with the actual project root.
+            path: /lab/px/AnichLabs/cxr-cnn-k8s-benchmark/experiments/checkpoints
+            type: Directory
+            

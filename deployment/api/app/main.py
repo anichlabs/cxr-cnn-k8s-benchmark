@@ -33,7 +33,7 @@ from instrumentation import (
     INFERENCE_DURATION_SECONDS,
     PREDICTIONS_TOTAL,
 )
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Query
 from pathlib import Path
 from PIL import Image
 import torch
@@ -440,84 +440,136 @@ def metadata():
 # 8. Prediction endpoint                                  #
 ###########################################################
 @app.post("/predict")
-async def predict(file: UploadFile = File(...)):
+async def predict(file: UploadFile = File(...), model: str = Query(default="mobilenet_v2_cxr")):
     """
-    This endpoint receives a chest X-ray image (JPG/PNG),
-    applies the SAME preprocessing as in training,
-    and returns a prediction.
+    Predict chest X-ray class from an uploaded image.
 
-    For now:
-    --------
-    We use a *dummy prediction* because model loading is a
-    separate step (it needs a stable Containerfile).
+    This endpoint accepts:
+    - file: The chest X-ray image (JPG or PNG format)
+    - model: The model name to use for prediction (queary paramenter)
+           Examples: ?model=mobilenet_v2_cxr, ?model=efficientnet_b0_imagenet
+           If not specified, defaults to mobilenetv2_cxr (the best performer)
 
-    In the next section of Notebook 06:
-    - load the real PyTorch model
-    - push the model to GPU (if available)
-    - return real predictions
+    Returns:
+    - prediction_index: The numeric class index (0, 1, or 2)
+    - prediction_class: The class name (Pneumonia, TB, or Normal)
+    - model_name: Which model was used for this preduction
+    - architecture: The neural network architecure (mobilenet_v2, efficientnet_b0, etc.)
+    - domain: Whether the model was trained on CXR or ImageNet data
+    - device: Whether inference ran on CPU or GPU
+    - class_map: The mapping of class names to indices
     """
 
     # ----------------------------------------------------
-    # 1. Load the image from the upload stream
+    # 1.  Load the requested model on-demand.
     # ----------------------------------------------------
+    # This function reads models_config.json, finds the model, instantiates it,
+    # loads the checkpoint weights, and returns both the model and its metadata.
+    try:
+        loaded_model, model_metadata = load_model_from_config(model, device)
+    except (ValueError, FileNotFoundError) as e:
+        # If model doesn't exist or checkpont file is missing, return error
+        return {"error": str(e), "status": 400} # A Status 400 is and HTTP error
+                                                # code meaning "Bad Request".
+                                                # This is a client-side problem, like
+                                                # malformed syntax or invalida data.
+
+    # ----------------------------------------------------
+    # 2. Load the image file from the upload.
+    # ----------------------------------------------------
+    # Convert to RGB ensures it's in the correct colour format (3 channels).
     img = Image.open(file.file).convert("RGB")
+    
+    # ---------------------------------------------------------------------
+    # 3. Get the correct normalisation values based on the model's domain
+    # ---------------------------------------------------------------------
+    # The model was trained with specific mean and std values.
+    # We must use the SAME values during inference or predictions will be wrong.
+    domain = model_metadata["domain"]
+    if domain == "cxr":
+        # Model was trained on chests X-ray data with CXR-specfic statistics.
+        mean = cfg["cxr_mean"]
+        std = cfg["cxr_std"]
+    else:
+        # Moedl was trained on chests X-ray data with ImageNet statistics (standard pretrained weights)
+        mean = cfg["imagenet_mean"]
+        std = cfg["imagenet_std"]
 
-    # ----------------------------------------------------
-    # 2. Recreate the preprocessing pipeline
-    # ----------------------------------------------------
-    # This MUST match:
-    # - notebooks 02, 03, 04
-    # - src/transforms.py logic
-    # Build evaluation transforms from the shared transform builder.
-    # Use cfg["transform_mode"] so the API matches the persisted config.
+    # ----------------------------------------------------------------
+    # 4. Build the preprocessing transforms (resize, normalize, etc).
+    # ----------------------------------------------------------------
+    # These transforms MUST match what was used during training.
+    # build_shared_transforms returns (train_transforms, eval_transforms)
+    # Use eval_transforms (the second return value, after underscore)
     _, tfm = build_shared_transforms(
         img_size=img_size,
         mean=mean,
         std=std,
         transform_mode=cfg.get("transform_mode", "center-crop")
     )
-
-    # Apply transforms and add batch dimension
+    
+    # ---------------------------------------
+    # 5. Apply the transforms to the image.
+    # ---------------------------------------
+    # tfm(img) applies all preprocessing (resize, crop, normalize).
+    # .unsqueeze(0) adds a batch dimension: shape becomes [1, 3, 256, 256]
+    # (batch_size=1, channels=3, height=256, width=256)
     x = tfm(img).unsqueeze(0)
 
+    # -----------------------------------------------------
+    # 6. Move the image to the correct device (CPU or GPU).
+    # -----------------------------------------------------
+    # This ensures the tensor is on the same device as the model.
+    x = x.to(device)
+
+    # -----------------------------------------------------------------------
+    # 7. Get the model type from environment variable (for metrics tracking).
+    # -----------------------------------------------------------------------
+    # This tells us if CPU or GPU is running.
+    model_type = os.getenv("MODEL_TYPE", "cpu")
+
+    # -----------------------------------------------------
+    # 8. Run the forward pass (inference) and measure time
+    # -----------------------------------------------------
+    # INFERENCE_DURATION_SECONDS.labels(model_type=model_type).time()
+    # is a Prometheus metric that records how long inference takes.
+    # torch.no_grad() tells PyTorch not to compute gradients (this is not training).
+    # logits are the raw output numbers from the model before converting to probabilities.
+    with INFERENCE_DURATION_SECONDS.labels(model_type=model_type).time():
+        with torch.no_grad():
+            logits = loaded_model(x)
+
+    # ---------------------------------------
+    # 9. Convert logits to class prediction. 
+    # ---------------------------------------
+    # logits.argmax(dim=1) finds with output is highest (most confident).
+    # .item() converts PyTorch tensor to Python number
+    # int() converts to integer (0, 1, or 2).
+    pred_idx = int(logits.argmax(dim=1).item())
+
+    # ----------------------------------------
+    # 10. Convert numeric index to class name. 
+    # ----------------------------------------
+    # Create reverse mapping: {0: "Pneumonia", 1: "TB", 2: "Normal"}
+    idx_to_class = {v: k for k, v in cfg["class_to_index"].items()}
+    pred_class = idx_to_class[pred_idx]
+
+    # -----------------------------------------------------
+    # 11. Record this prediction for metrics (Prometheus).
+    # -----------------------------------------------------
+    # This increments a counter: total predictions made.
+    PREDICTIONS_TOTAL.labels(model_type=model_type).inc()
+
     # ----------------------------------------------------
-    # 3. Real prediction if model is available
+    # 12. Return the prediction result with all metadata.
     # ----------------------------------------------------
-    if model is not None:
-        model.eval()
-        x = x.to(device)
-
-        model_type = os.getenv("MODEL_TYPE", "cpu")
-
-        with INFERENCE_DURATION_SECONDS.labels(model_type=model_type).time():
-            with torch.no_grad():
-                logits = model(x)
-
-        pred_idx = int(logits.argmax(dim=1).item())
-        PREDICTIONS_TOTAL.labels(model_type=model_type).inc()
-
-
-        idx_to_class = {v: k for k, v in cfg["class_to_index"].items()}
-        pred_class = idx_to_class[pred_idx]
-
-        return {
-            "prediction_index": pred_idx,
-            "prediction_class": pred_class,
-            "architecture": ckpt_arch,
-            "domain": ckpt_domain,
-            "device": str(device),
-            "class_map": cfg["class_to_index"]
-        }
-
-    # ----------------------------------------------------
-    # 4. Fallback: no checkpoint mounted (dummy mode)
-    # ----------------------------------------------------
-    dummy_prediction = torch.tensor([0])
+    # Client gets the class name, the index, which model was used, and more.
     return {
-        "prediction_index": int(dummy_prediction.item()),
-        "prediction_class": "dummy",
-        "architecture": "none",
-        "domain": "none",
+        "prediction_index": pred_idx,
+        "prediction_class": pred_class,
+        "model_name": model_metadata["model_name"],
+        "architecture": model_metadata["architecture"],
+        "domain": model_metadata["domain"],
         "device": str(device),
         "class_map": cfg["class_to_index"]
     }
