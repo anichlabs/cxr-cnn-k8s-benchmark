@@ -44,6 +44,9 @@ from app.models.victorio import build_victorio
 # This pulls the shared preprocessing builder from src/transforms.py.
 from src.transforms import build_shared_transforms
 
+# To tell FastAPI to serve the demo/index.html file.
+from fastapi.staticfiles import StaticFiles
+
 logging.basicConfig(level=logging.DEBUG)
 
 ###########################################################
@@ -644,3 +647,11 @@ def list_models():
     return {
         "available_models": sorted(models_list, key=lambda x: x["name"])
     }
+
+#######################################
+# 10. Serve static demo UI.           #
+#######################################
+# Mount the /demo directory as a static file server.
+# This serves the demo/index.html file and any assets.
+# Users access it at: http://localhost:8001/demo/
+app.mount("/demo", StaticFiles(directory="/app/demo", html=True), name="demo")

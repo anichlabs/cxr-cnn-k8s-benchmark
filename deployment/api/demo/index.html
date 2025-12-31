@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CXR Classifier Demo - AnichLabs</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', 'Open Sans', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+      color: #16191F;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 50px;
+      padding: 30px 0;
+      border-bottom: 2px solid #00B5AD;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      color: #232F3E;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      font-size: 1.1rem;
+      color: #0A2540;
+    }
+
+    .logo {
+      font-size: 0.9rem;
+      color: #00B5AD;
+      font-weight: 600;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+
+    .upload-section {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .upload-section h2 {
+      font-size: 1.5rem;
+      color: #232F3E;
+      margin-bottom: 20px;
+    }
+
+    .drop-zone {
+      border: 3px dashed #00B5AD;
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: #f9f9f9;
+    }
+
+    .drop-zone:hover {
+      background: #f0fffe;
+      border-color: #005a55;
+    }
+
+    .drop-zone.active {
+      background: #e6fffe;
+      border-color: #005a55;
+    }
+
+    .drop-zone p {
+      font-size: 1rem;
+      color: #0A2540;
+      margin-bottom: 10px;
+    }
+
+    .drop-zone small {
+      display: block;
+      color: #666;
+      margin-top: 10px;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .model-selection {
+      margin: 20px 0;
+    }
+
+    .model-selection label {
+      display: block;
+      font-weight: 600;
+      color: #232F3E;
+      margin-bottom: 10px;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+      color: #0A2540;
+      background: white;
+      cursor: pointer;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #00B5AD;
+      box-shadow: 0 0 0 3px rgba(0, 181, 173, 0.1);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 20px;
+      background: #00B5AD;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #005a55;
+    }
+
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .results-section {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .results-section h2 {
+      font-size: 1.5rem;
+      color: #232F3E;
+      margin-bottom: 20px;
+    }
+
+    .result-card {
+      display: none;
+      padding: 20px;
+      background: #f9f9f9;
+      border-left: 4px solid #00B5AD;
+      border-radius: 4px;
+    }
+
+    .result-card.show {
+      display: block;
+    }
+
+    .prediction-result {
+      font-size: 1.3rem;
+      color: #232F3E;
+      margin: 15px 0;
+    }
+
+    .prediction-class {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #00B5AD;
+      margin: 10px 0;
+    }
+
+    .metadata {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #ddd;
+    }
+
+    .metadata p {
+      margin: 5px 0;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .loading.show {
+      display: block;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #00B5AD;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error {
+      color: #d32f2f;
+      padding: 10px;
+      background: #ffebee;
+      border-left: 4px solid #d32f2f;
+      border-radius: 4px;
+      margin: 10px 0;
+      display: none;
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    .preview-image {
+      max-width: 100%;
+      max-height: 300px;
+      margin: 20px 0;
+      border-radius: 4px;
+      display: none;
+    }
+
+    .preview-image.show {
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+
+      header h1 {
+        font-size: 1.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">AnichLabs</div>
+      <h1>CXR Classifier Demo</h1>
+      <p>Multi-model chest X-ray classification with configurable AI models</p>
+    </header>
+
+    <div class="main-content">
+      <div class="upload-section">
+        <h2>Upload Image</h2>
+        
+        <div class="drop-zone" id="dropZone">
+          <p>Click to upload your chest X-ray image</p>
+          <small>Select from your computer</small>
+          <input type="file" id="fileInput" accept="image/jpeg,image/png">
+        </div>
+
+        <img id="previewImage" class="preview-image" alt="Preview">
+
+        <div class="model-selection">
+          <label for="modelSelect">Select Model:</label>
+          <select id="modelSelect">
+            <option value="">Loading models...</option>
+          </select>
+        </div>
+
+        <button id="predictBtn" disabled>Predict</button>
+        
+        <div class="error" id="errorMsg"></div>
+      </div>
+
+      <div class="results-section">
+        <h2>Prediction Results</h2>
+        
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+          <p>Processing image...</p>
+        </div>
+
+        <div class="result-card" id="resultCard">
+          <div class="prediction-result">
+            Predicted Class:
+            <div class="prediction-class" id="predictionClass">—</div>
+          </div>
+          
+          <div class="metadata">
+            <p><strong>Model Used:</strong> <span id="modelName">—</span></p>
+            <p><strong>Architecture:</strong> <span id="architecture">—</span></p>
+            <p><strong>Training Domain:</strong> <span id="domain">—</span></p>
+            <p><strong>Device:</strong> <span id="device">—</span></p>
+            <p><strong>Prediction Index:</strong> <span id="predictionIndex">—</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:8001';
+    
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const previewImage = document.getElementById('previewImage');
+    const modelSelect = document.getElementById('modelSelect');
+    const predictBtn = document.getElementById('predictBtn');
+    const loading = document.getElementById('loading');
+    const resultCard = document.getElementById('resultCard');
+    const errorMsg = document.getElementById('errorMsg');
+
+    let currentFile = null;
+
+    document.addEventListener('DOMContentLoaded', loadModels);
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        currentFile = e.target.files[0];
+        handleFileSelect(e.target.files[0]);
+      }
+    });
+
+    function handleFileSelect(file) {
+      if (!file.type.startsWith('image/')) {
+        showError('Please select a valid image file');
+        return;
+      }
+
+      resultCard.classList.remove('show');
+      errorMsg.classList.remove('show');
+      loading.classList.remove('show');
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        previewImage.src = e.target.result;
+        previewImage.classList.add('show');
+        predictBtn.disabled = false;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function loadModels() {
+      try {
+        const response = await fetch(`${API_BASE}/models`);
+        if (!response.ok) throw new Error('Failed to load models');
+        
+        const data = await response.json();
+        const models = data.available_models;
+
+        modelSelect.innerHTML = '';
+        models.forEach((model) => {
+          const option = document.createElement('option');
+          option.value = model.name;
+          option.textContent = `${model.name} - ${model.description}`;
+          modelSelect.appendChild(option);
+        });
+
+        if (models.length > 0) {
+          modelSelect.value = models[0].name;
+        }
+      } catch (error) {
+        showError('Failed to load models: ' + error.message);
+      }
+    }
+
+    predictBtn.addEventListener('click', predict);
+
+    async function predict() {
+      const file = currentFile;
+      const selectedModel = modelSelect.value;
+
+      if (!file || !selectedModel) {
+        showError('Please select an image and a model');
+        return;
+      }
+
+      loading.classList.add('show');
+      resultCard.classList.remove('show');
+      errorMsg.classList.remove('show');
+
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch(
+          `${API_BASE}/predict?model=${selectedModel}`,
+          {
+            method: 'POST',
+            body: formData
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Prediction failed');
+        }
+
+        const result = await response.json();
+        displayResults(result);
+      } catch (error) {
+        showError('Error: ' + error.message);
+      } finally {
+        loading.classList.remove('show');
+      }
+    }
+
+    function displayResults(result) {
+      document.getElementById('predictionClass').textContent = result.prediction_class;
+      document.getElementById('predictionIndex').textContent = result.prediction_index;
+      document.getElementById('modelName').textContent = result.model_name;
+      document.getElementById('architecture').textContent = result.architecture;
+      document.getElementById('domain').textContent = result.domain;
+      document.getElementById('device').textContent = result.device;
+      
+      resultCard.classList.add('show');
+    }
+
+    function showError(message) {
+      errorMsg.textContent = message;
+      errorMsg.classList.add('show');
+    }
+  </script>
+</body>
+</html>

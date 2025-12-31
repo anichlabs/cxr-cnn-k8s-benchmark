@@ -75,13 +75,19 @@ COPY --chown=appuser:appuser deployment/api/app/ /app/app/
 COPY --chown=appuser:appuser src/ /app/src/
 COPY --chown=appuser:appuser deployment/api/config/ /app/config/
 
+#############################
+# 8 Copy demo UI          #
+#############################
+# Copy the demo HTML interface so clients can access it at /demo/
+COPY --chown=appuser:appuser deployment/api/demo/ /app/demo/
+
 ###############################
-# 8. Expose port for FastAPI  #
+# 9. Expose port for FastAPI  #
 ###############################
 EXPOSE 8000
 
 ###########################################################
-# 9. Entrypoint                                            #
+# 10. Entrypoint                                            #
 ###########################################################
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
