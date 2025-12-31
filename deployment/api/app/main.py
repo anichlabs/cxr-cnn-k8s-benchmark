@@ -27,7 +27,7 @@ This file will later:
 import time
 import os
 import logging
-from instrumentation import (
+from app.instrumentation import (
     HTTP_REQUESTS_TOTAL,
     HTTP_REQUEST_DURATION_SECONDS,
     INFERENCE_DURATION_SECONDS,
@@ -38,8 +38,8 @@ from pathlib import Path
 from PIL import Image
 import torch
 import json
-from metrics import router as metrics_router
-from models.victorio import build_victorio
+from app.metrics import router as metrics_router
+from app.models.victorio import build_victorio
 
 # This pulls the shared preprocessing builder from src/transforms.py.
 from src.transforms import build_shared_transforms
@@ -261,7 +261,7 @@ def load_model_from_config(model_name: str, device: torch.device):
         model.fc = torch.nn.Linear(model.fc.in_features, num_classes)
 
     elif architecture == "victorio":
-        from src.models.victorio import build_victorio
+        from app.models.victorio import build_victorio
         model = build_victorio(num_classes)
 
     else:

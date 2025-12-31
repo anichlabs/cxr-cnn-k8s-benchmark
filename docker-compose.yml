@@ -10,7 +10,7 @@ services:
     ports:
       - "8001:8000"
     environment:
-      - MODEL_TYPE=${DEVICE=-cpu}
+      - MODEL_TYPE=${DEVICE:-cpu}
       - PYTHONUNBUFFERED=1
     volumes:
       - ./experiments/checkpoints:/app/checkpoints:ro
