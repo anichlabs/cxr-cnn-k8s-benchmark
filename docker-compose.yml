@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  cxr-api:
+    build:
+      context: .
+      dockerfile: deployment/api/Containerfile.${DEVICE:-cpu}
+      args:
+        DEVICE: ${DEVICE:-cpu}
+    ports:
+      - "8001:8000"
+    environment:
+      - MODEL_TYPE=${DEVICE=-cpu}
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./experiments/checkpoints:/app/checkpoints:ro
+    working_dir: /app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    runtime: ${RUNTIME:-runc}
