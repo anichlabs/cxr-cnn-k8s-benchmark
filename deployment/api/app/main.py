@@ -573,3 +573,74 @@ async def predict(file: UploadFile = File(...), model: str = Query(default="mobi
         "device": str(device),
         "class_map": cfg["class_to_index"]
     }
+
+    
+#######################################
+# 9. List available models endpoint.  #
+#######################################
+@app.get("/models")
+def list_models():
+    """
+    List all available models from models_config.json.
+
+    Returns:
+        JSON with model names, descriptions, and training domains.
+        Clients use this to choose which model to use for prediction.
+
+    Example response:
+    {
+      "available_models": [
+        {
+          "name": "mobilenet_v2_cxr",
+          "description": "Optimised for speed (lightweight, fast inference)",
+          "training_domain": "CXR data"
+        }
+      ]
+    }
+    """
+
+    # Load the models configuration file.
+    # This file lists all available models and their metadata.
+    config_path = Path("/app/config/models_config.json")
+    config = json.loads(config_path.read_text())
+
+    # Extract the available_model dictionary from config.
+    available = config["available_models"]
+
+    # Build a simplified response for clients.
+    # We only show information that helps them choose a model.
+    # We hide internal details like checkpoint paths
+    models_list = []
+
+    # Iterate through each model in the config.
+    for model_name, model_info in available.items():
+        # Determine a human-readable description based on architecture.
+        # This tells clients why they might choose this model.
+        architecture = model_info["architecture"]
+
+        if architecture == "mobilenet_v2":
+            description = "Optimised for speed (lightweight, fast inference)"
+        elif architecture == "efficientnet_b0":
+            description = "Balanced performance and accuracy"
+        elif architecture == "resnet50":
+            description = "High accuracy (larger, slower inference)"
+        elif architecture == "victorio":
+            description = "Custom lightweight CNN"
+        else:
+            description = "Unknown architecture"
+
+        # Build a model entry with only client-facing information.
+        model_entry = {
+            "name": model_name,
+            "description": description,
+            "training_domain": model_info["domain"]
+        }
+
+        # Add this entry to the list.
+        models_list.append(model_entry)
+
+        # Return the list sorted alphabetically for consistency.
+        # Sorted by model name so clients see a predictable order.
+    return {
+        "available_models": sorted(models_list, key=lambda x: x["name"])
+    }
