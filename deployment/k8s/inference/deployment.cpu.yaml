@@ -20,8 +20,8 @@ spec:
     spec:
       containers:
       - name: inference-cpu
-        image: cxr-api:cpu
-        imagePullPolicy: IfNotPresent
+        image: localhost/cxr-api:cpu
+        imagePullPolicy: Never
 
         ports:
           - containerPort: 8000
