@@ -52,5 +52,5 @@ spec:
         - name: checkpoints-volume
           hostPath:
             # Replace /lab/px/AnichLabs/cxr-cnn-k8s-benchmark with the actual project root.
-            path: /lab/px/AnichLabs/cxr-cnn-k8s-benchmark/experiments/checkpoints
+            path: /var/lib/cxr-checkpoints
             type: Directory
