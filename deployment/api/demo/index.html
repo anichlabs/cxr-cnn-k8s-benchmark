@@ -288,6 +288,35 @@
       text-decoration: underline;
     }
 
+    .samples-section {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #e5e5e5;
+    }
+    .samples-section h3 {
+      font-size: 0.85rem;
+      color: #555;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+    .samples-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .thumb {
+      width: 48px;
+      height: 48px;
+      object-fit: cover;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .thumb:hover {
+      border-color: #00B5AD;
+      transform: scale(1.05);
+    }
   </style>
 </head>
 <body>
@@ -308,6 +337,24 @@
           <small>Select from your computer</small>
           <input type="file" id="fileInput" accept="image/jpeg,image/png">
         </div>
+        <div class="samples-section">
+          <h3>Or try a sample image:</h3>
+          <div class="samples-grid">
+            <img class="thumb" data-sample="pneumonia_01.jpg" src="samples/pneumonia_01.jpg" alt="sample">
+            <img class="thumb" data-sample="pneumonia_02.jpg" src="samples/pneumonia_02.jpg" alt="sample">
+            <img class="thumb" data-sample="pneumonia_03.jpg" src="samples/pneumonia_03.jpg" alt="sample">
+            <img class="thumb" data-sample="pneumonia_04.jpg" src="samples/pneumonia_04.jpg" alt="sample">
+            <img class="thumb" data-sample="tb_01.png" src="samples/tb_01.png" alt="sample">
+            <img class="thumb" data-sample="tb_02.png" src="samples/tb_02.png" alt="sample">
+            <img class="thumb" data-sample="tb_03.png" src="samples/tb_03.png" alt="sample">
+            <img class="thumb" data-sample="tb_04.png" src="samples/tb_04.png" alt="sample">
+            <img class="thumb" data-sample="normal_01.png" src="samples/normal_01.png" alt="sample">
+            <img class="thumb" data-sample="normal_02.png" src="samples/normal_02.png" alt="sample">
+            <img class="thumb" data-sample="normal_03.png" src="samples/normal_03.png" alt="sample">
+            <img class="thumb" data-sample="normal_04.png" src="samples/normal_04.png" alt="sample">
+          </div>
+        </div>
+
 
         <img id="previewImage" class="preview-image" alt="Preview">
 
@@ -366,6 +413,21 @@
     document.addEventListener('DOMContentLoaded', loadModels);
 
     dropZone.addEventListener('click', () => fileInput.click());
+    document.querySelectorAll('.thumb').forEach((thumb) => {
+      thumb.addEventListener('click', async (e) => {
+        const name = e.target.dataset.sample;
+        try {
+          const resp = await fetch(`samples/${name}`);
+          const blob = await resp.blob();
+          const file = new File([blob], name, { type: blob.type });
+          currentFile = file;
+          handleFileSelect(file);
+        } catch (err) {
+          showError('Failed to load sample: ' + err.message);
+        }
+      });
+    });
+
 
     fileInput.addEventListener('change', (e) => {
       if (e.target.files.length > 0) {
