@@ -273,6 +273,21 @@
         font-size: 1.8rem;
       }
     }
+    .disclaimer {
+      margin-top: 20px;
+      padding: 12px 18px;
+      background: #fff4e5;
+      border-left: 4px solid #d97706;
+      border-radius: 4px;
+      color: #7c2d12;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+    .disclaimer a {
+      color: #7c2d12;
+      text-decoration: underline;
+    }
+
   </style>
 </head>
 <body>
@@ -281,6 +296,7 @@
       <div class="logo">AnichLabs</div>
       <h1>CXR Classifier Demo</h1>
       <p>Multi-model chest X-ray classification with configurable AI models</p>
+      <div class="disclaimer"><strong>Research demo only.</strong> Not a medical device. Not for clinical use, diagnosis, or treatment decisions. Trained on public research datasets (CheXpert, TBX11K). See <a href="https://anichlabs.com" target="_blank" rel="noopener">project notes</a> for details.</div>
     </header>
 
     <div class="main-content">
@@ -334,7 +350,7 @@
   </div>
 
   <script>
-    const API_BASE = 'http://localhost:8001';
+    const API_BASE = '';
     
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');

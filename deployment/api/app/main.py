@@ -653,5 +653,5 @@ def list_models():
 #######################################
 # Mount the /demo directory as a static file server.
 # This serves the demo/index.html file and any assets.
-# Users access it at: http://localhost:8001/demo/
-app.mount("/demo", StaticFiles(directory="/app/demo", html=True), name="demo")
+# Users access it at the site root /
+app.mount("/", StaticFiles(directory="/app/demo", html=True), name="demo")
