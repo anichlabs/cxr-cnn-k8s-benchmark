@@ -1,0 +1,25 @@
+services:
+  cxr-api:
+    image: localhost/cxr-api:cpu
+    build:
+      context: ..
+      dockerfile: deployment/api/Containerfile.cpu
+      args:
+        DEVICE: cpu
+    ports:
+      - "127.0.0.1:8001:8000"
+    environment:
+      - MODEL_TYPE=cpu
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=info
+    volumes:
+      - ../experiments/checkpoints:/app/checkpoints:ro
+    working_dir: /app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 1 --log-level info
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request, sys; sys.exit(0) if urllib.request.urlopen('http://localhost:8000/health', timeout=2).status == 200 else sys.exit(1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
