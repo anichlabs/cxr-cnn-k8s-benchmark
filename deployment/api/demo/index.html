@@ -293,15 +293,39 @@
       padding-top: 16px;
       border-top: 1px solid #e5e5e5;
     }
-    .samples-section h3 {
+    .samples-section > h3 {
       font-size: 0.85rem;
       color: #555;
       margin-bottom: 10px;
       font-weight: 500;
     }
-    .samples-grid {
+    .tabs {
       display: flex;
-      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #e5e5e5;
+    }
+    .tab-btn {
+      padding: 8px 14px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #555;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab-btn:hover { color: #00B5AD; }
+    .tab-btn.active {
+      color: #00B5AD;
+      border-bottom-color: #00B5AD;
+      font-weight: 600;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .samples-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 48px);
       gap: 6px;
     }
     .thumb {
@@ -339,20 +363,114 @@
         </div>
         <div class="samples-section">
           <h3>Or try a sample image:</h3>
-          <div class="samples-grid">
-            <img class="thumb" data-sample="pneumonia_01.jpg" src="samples/pneumonia_01.jpg" alt="sample">
-            <img class="thumb" data-sample="pneumonia_02.jpg" src="samples/pneumonia_02.jpg" alt="sample">
-            <img class="thumb" data-sample="pneumonia_03.jpg" src="samples/pneumonia_03.jpg" alt="sample">
-            <img class="thumb" data-sample="pneumonia_04.jpg" src="samples/pneumonia_04.jpg" alt="sample">
-            <img class="thumb" data-sample="tb_01.png" src="samples/tb_01.png" alt="sample">
-            <img class="thumb" data-sample="tb_02.png" src="samples/tb_02.png" alt="sample">
-            <img class="thumb" data-sample="tb_03.png" src="samples/tb_03.png" alt="sample">
-            <img class="thumb" data-sample="tb_04.png" src="samples/tb_04.png" alt="sample">
-            <img class="thumb" data-sample="normal_01.png" src="samples/normal_01.png" alt="sample">
-            <img class="thumb" data-sample="normal_02.png" src="samples/normal_02.png" alt="sample">
-            <img class="thumb" data-sample="normal_03.png" src="samples/normal_03.png" alt="sample">
-            <img class="thumb" data-sample="normal_04.png" src="samples/normal_04.png" alt="sample">
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="pneumonia">Pneumonia</button>
+            <button class="tab-btn" data-tab="tb">Tuberculosis</button>
+            <button class="tab-btn" data-tab="normal">Normal</button>
           </div>
+          <div class="tab-panel active" data-panel="pneumonia">
+            <div class="samples-grid">
+              <img class="thumb" data-sample="pneumonia_01.jpg" src="samples/thumbs/pneumonia_01.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_02.jpg" src="samples/thumbs/pneumonia_02.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_03.jpg" src="samples/thumbs/pneumonia_03.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_04.jpg" src="samples/thumbs/pneumonia_04.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_05.jpg" src="samples/thumbs/pneumonia_05.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_06.jpg" src="samples/thumbs/pneumonia_06.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_07.jpg" src="samples/thumbs/pneumonia_07.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_08.jpg" src="samples/thumbs/pneumonia_08.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_09.jpg" src="samples/thumbs/pneumonia_09.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_10.jpg" src="samples/thumbs/pneumonia_10.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_11.jpg" src="samples/thumbs/pneumonia_11.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_12.jpg" src="samples/thumbs/pneumonia_12.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_13.jpg" src="samples/thumbs/pneumonia_13.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_14.jpg" src="samples/thumbs/pneumonia_14.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_15.jpg" src="samples/thumbs/pneumonia_15.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_16.jpg" src="samples/thumbs/pneumonia_16.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_17.jpg" src="samples/thumbs/pneumonia_17.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_18.jpg" src="samples/thumbs/pneumonia_18.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_19.jpg" src="samples/thumbs/pneumonia_19.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_20.jpg" src="samples/thumbs/pneumonia_20.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_21.jpg" src="samples/thumbs/pneumonia_21.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_22.jpg" src="samples/thumbs/pneumonia_22.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_23.jpg" src="samples/thumbs/pneumonia_23.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_24.jpg" src="samples/thumbs/pneumonia_24.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_25.jpg" src="samples/thumbs/pneumonia_25.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_26.jpg" src="samples/thumbs/pneumonia_26.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_27.jpg" src="samples/thumbs/pneumonia_27.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_28.jpg" src="samples/thumbs/pneumonia_28.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_29.jpg" src="samples/thumbs/pneumonia_29.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_30.jpg" src="samples/thumbs/pneumonia_30.webp" alt="sample" loading="lazy">
+            </div>
+          </div>
+          <div class="tab-panel" data-panel="tb">
+            <div class="samples-grid">
+              <img class="thumb" data-sample="tb_01.jpg" src="samples/thumbs/tb_01.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_02.jpg" src="samples/thumbs/tb_02.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_03.jpg" src="samples/thumbs/tb_03.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_04.jpg" src="samples/thumbs/tb_04.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_05.jpg" src="samples/thumbs/tb_05.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_06.jpg" src="samples/thumbs/tb_06.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_07.jpg" src="samples/thumbs/tb_07.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_08.jpg" src="samples/thumbs/tb_08.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_09.jpg" src="samples/thumbs/tb_09.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_10.jpg" src="samples/thumbs/tb_10.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_11.jpg" src="samples/thumbs/tb_11.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_12.jpg" src="samples/thumbs/tb_12.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_13.jpg" src="samples/thumbs/tb_13.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_14.jpg" src="samples/thumbs/tb_14.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_15.jpg" src="samples/thumbs/tb_15.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_16.jpg" src="samples/thumbs/tb_16.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_17.jpg" src="samples/thumbs/tb_17.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_18.jpg" src="samples/thumbs/tb_18.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_19.jpg" src="samples/thumbs/tb_19.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_20.jpg" src="samples/thumbs/tb_20.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_21.jpg" src="samples/thumbs/tb_21.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_22.jpg" src="samples/thumbs/tb_22.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_23.jpg" src="samples/thumbs/tb_23.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_24.jpg" src="samples/thumbs/tb_24.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_25.jpg" src="samples/thumbs/tb_25.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_26.jpg" src="samples/thumbs/tb_26.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_27.jpg" src="samples/thumbs/tb_27.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_28.jpg" src="samples/thumbs/tb_28.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_29.jpg" src="samples/thumbs/tb_29.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_30.jpg" src="samples/thumbs/tb_30.webp" alt="sample" loading="lazy">
+            </div>
+          </div>
+          <div class="tab-panel" data-panel="normal">
+            <div class="samples-grid">
+              <img class="thumb" data-sample="normal_01.jpg" src="samples/thumbs/normal_01.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_02.jpg" src="samples/thumbs/normal_02.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_03.jpg" src="samples/thumbs/normal_03.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_04.jpg" src="samples/thumbs/normal_04.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_05.jpg" src="samples/thumbs/normal_05.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_06.jpg" src="samples/thumbs/normal_06.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_07.jpg" src="samples/thumbs/normal_07.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_08.jpg" src="samples/thumbs/normal_08.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_09.jpg" src="samples/thumbs/normal_09.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_10.jpg" src="samples/thumbs/normal_10.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_11.jpg" src="samples/thumbs/normal_11.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_12.jpg" src="samples/thumbs/normal_12.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_13.jpg" src="samples/thumbs/normal_13.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_14.jpg" src="samples/thumbs/normal_14.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_15.jpg" src="samples/thumbs/normal_15.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_16.jpg" src="samples/thumbs/normal_16.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_17.jpg" src="samples/thumbs/normal_17.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_18.jpg" src="samples/thumbs/normal_18.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_19.jpg" src="samples/thumbs/normal_19.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_20.jpg" src="samples/thumbs/normal_20.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_21.jpg" src="samples/thumbs/normal_21.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_22.jpg" src="samples/thumbs/normal_22.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_23.jpg" src="samples/thumbs/normal_23.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_24.jpg" src="samples/thumbs/normal_24.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_25.jpg" src="samples/thumbs/normal_25.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_26.jpg" src="samples/thumbs/normal_26.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_27.jpg" src="samples/thumbs/normal_27.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_28.jpg" src="samples/thumbs/normal_28.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_29.jpg" src="samples/thumbs/normal_29.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_30.jpg" src="samples/thumbs/normal_30.webp" alt="sample" loading="lazy">
+            </div>
+          </div>
+        
         </div>
 
 
@@ -413,11 +531,12 @@
     document.addEventListener('DOMContentLoaded', loadModels);
 
     dropZone.addEventListener('click', () => fileInput.click());
+    // Sample gallery click handler (loads full image, not thumbnail)
     document.querySelectorAll('.thumb').forEach((thumb) => {
       thumb.addEventListener('click', async (e) => {
         const name = e.target.dataset.sample;
         try {
-          const resp = await fetch(`samples/${name}`);
+          const resp = await fetch(`samples/fulls/${name}`);
           const blob = await resp.blob();
           const file = new File([blob], name, { type: blob.type });
           currentFile = file;
@@ -425,6 +544,17 @@
         } catch (err) {
           showError('Failed to load sample: ' + err.message);
         }
+      });
+    });
+
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.tab;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+        document.querySelectorAll('.tab-panel').forEach(panel => {
+          panel.classList.toggle('active', panel.dataset.panel === target);
+        });
       });
     });
 
