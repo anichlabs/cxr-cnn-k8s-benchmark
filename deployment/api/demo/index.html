@@ -456,6 +456,79 @@
       letter-spacing: -0.02em;
       font-variant-numeric: tabular-nums;
     }
+    .benchmark-section {
+      margin-top: 40px;
+      padding-top: 32px;
+      border-top: 1px solid #e2e2e4;
+    }
+    .benchmark-title {
+      font-family: 'Bricolage Grotesque', 'Inter', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #000000;
+      margin: 0 0 4px 0;
+    }
+    .benchmark-sub {
+      color: #696a6d;
+      font-size: 0.85rem;
+      margin: 0 0 20px 0;
+    }
+    .benchmark-list { display: flex; flex-direction: column; gap: 8px; }
+    .benchmark-loading { color: #909192; font-size: 0.85rem; margin: 0; }
+    .bench-row {
+      display: grid;
+      grid-template-columns: 200px 1fr 80px;
+      gap: 12px;
+      align-items: center;
+      font-size: 0.85rem;
+    }
+    @media (max-width: 720px) {
+      .bench-row {
+        grid-template-columns: 1fr;
+        gap: 4px;
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+      }
+    }
+    .bench-name {
+      color: #2a2a2d;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .bench-name .bench-tag {
+      display: inline-block;
+      font-size: 0.65rem;
+      padding: 1px 6px;
+      border-radius: 3px;
+      margin-left: 6px;
+      font-weight: 500;
+      vertical-align: 1px;
+    }
+    .bench-tag.cxr { background: #dbe4ff; color: #003399; }
+    .bench-tag.imagenet { background: #f5f5f5; color: #696a6d; }
+    .bench-bar-track {
+      height: 10px;
+      background: #f0f1f3;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .bench-bar-fill {
+      height: 100%;
+      background: #003399;
+      width: 0;
+      transition: width 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+      border-radius: 5px;
+    }
+    .bench-value {
+      font-family: 'Bricolage Grotesque', 'Inter', sans-serif;
+      font-weight: 600;
+      color: #000000;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
   </style>
 </head>
 <body>
@@ -631,6 +704,14 @@
         </div>
       </div>
     </div>
+
+    <section class="benchmark-section">
+      <h2 class="benchmark-title">Benchmark results</h2>
+      <p class="benchmark-sub">Test-set accuracy of all eight trained models. From the MSc thesis evaluation pipeline.</p>
+      <div class="benchmark-list" id="benchmark-list">
+        <p class="benchmark-loading">Loading…</p>
+      </div>
+    </section>
 
     <section class="dashboard-section">
       <h2 class="dashboard-title">Live metrics</h2>
@@ -843,6 +924,46 @@
     }
     refreshDashboard();
     setInterval(refreshDashboard, 10000);
+
+  
+    // ----- Benchmark results bars -----
+    async function loadBenchmark() {
+      const container = document.getElementById('benchmark-list');
+      try {
+        const r = await fetch('/evaluation-results', { cache: 'no-store' });
+        if (!r.ok) throw new Error('http ' + r.status);
+        const data = await r.json();
+        if (data.error || !data.results) throw new Error(data.error || 'no results');
+        const accs = data.results.map(d => d.accuracy);
+        const minAcc = Math.min(...accs);
+        const maxAcc = Math.max(...accs);
+        const range = Math.max(maxAcc - minAcc, 0.001);
+        container.innerHTML = '';
+        data.results.forEach((row, i) => {
+          const pctTrue = (row.accuracy * 100).toFixed(2);
+          const pctBar = ((row.accuracy - minAcc) / range) * 100;
+          const tagClass = row.normalisation.toLowerCase() === 'cxr' ? 'cxr' : 'imagenet';
+          const div = document.createElement('div');
+          div.className = 'bench-row';
+          div.innerHTML = `
+            <div class="bench-name">${row.model}<span class="bench-tag ${tagClass}">${row.normalisation}</span></div>
+            <div class="bench-bar-track"><div class="bench-bar-fill" data-target="${pctBar.toFixed(2)}"></div></div>
+            <div class="bench-value">${pctTrue}%</div>
+          `;
+          container.appendChild(div);
+        });
+        requestAnimationFrame(() => {
+          document.querySelectorAll('.bench-bar-fill').forEach((el, idx) => {
+            setTimeout(() => {
+              el.style.width = el.dataset.target + '%';
+            }, idx * 60);
+          });
+        });
+      } catch (e) {
+        container.innerHTML = '<p class="benchmark-loading">Could not load results.</p>';
+      }
+    }
+    loadBenchmark();
 
   </script>
 </body>
