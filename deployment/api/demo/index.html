@@ -21,7 +21,8 @@
 
     body {
       font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
-      background: #ffffff;
+      background: linear-gradient(138deg, #ffffff 0%, #ffffff 18%, #dbe4ff 100%);
+      background-attachment: fixed;
       color: #000000;
       line-height: 1.6;
       min-height: 100vh;
@@ -599,38 +600,148 @@
     .tab-placeholder { color: #909192; font-size: 0.95rem; }
     .site-footer {
       max-width: 1100px;
-      margin: 80px auto 40px;
-      padding: 32px 8px 0;
+      margin: 80px auto 0;
+      padding: 48px 8px 24px;
       border-top: 1px solid #e2e2e4;
       color: #696a6d;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
     }
-    .footer-inner {
+    .footer-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 24px;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 32px;
+      padding-bottom: 40px;
     }
     @media (max-width: 720px) {
-      .footer-inner { grid-template-columns: repeat(2, 1fr); }
+      .footer-grid { grid-template-columns: 1fr; gap: 24px; }
     }
-    .footer-block p { margin: 0 0 4px; line-height: 1.5; }
-    .footer-label {
-      color: #000;
+    .footer-logo {
+      text-decoration: none;
+      font-size: 1.15rem;
+      font-family: 'Bricolage Grotesque', 'Inter', sans-serif;
+      letter-spacing: -0.01em;
+      display: inline-block;
+    }
+    .footer-desc {
+      margin: 16px 0 20px;
+      color: #696a6d;
+      line-height: 1.6;
+      max-width: 480px;
+      font-size: 0.875rem;
+    }
+    .footer-socials { display: flex; gap: 16px; }
+    .footer-socials a {
+      color: #909192;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s ease;
+    }
+    .footer-socials a:hover { color: #003399; }
+    .footer-socials svg { width: 20px; height: 20px; }
+    .footer-col h3 {
+      font-family: 'Bricolage Grotesque', 'Inter', sans-serif;
+      font-size: 1rem;
       font-weight: 600;
+      color: #2a2a2d;
+      margin: 0 0 12px;
+    }
+    .footer-col ul { list-style: none; padding: 0; margin: 0; }
+    .footer-col li { margin: 0 0 6px; }
+    .footer-col a {
+      color: #696a6d;
+      text-decoration: none;
+      font-size: 0.875rem;
+      transition: color 0.15s ease;
+    }
+    .footer-col a:hover { color: #003399; }
+    .footer-bottom {
+      border-top: 1px solid #e2e2e4;
+      padding-top: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: space-between;
+      align-items: center;
+      color: #909192;
+      font-size: 0.8rem;
+    }
+    .footer-bottom p { margin: 0; }
+    .overview-pane { padding-top: 24px; }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 32px 0;
+    }
+    @media (max-width: 720px) {
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .stat-card {
+      background: #ffffff;
+      border: 1px solid #e2e2e4;
+      border-radius: 12px;
+      padding: 20px;
+      transition: border-color 0.15s ease;
+    }
+    .stat-card:hover { border-color: #003399; }
+    .stat-value {
+      font-family: 'Bricolage Grotesque', 'Inter', sans-serif;
+      font-size: 2rem;
+      font-weight: 600;
+      color: #000000;
+      letter-spacing: -0.025em;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .stat-unit {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #696a6d;
+      margin-left: 2px;
+    }
+    .stat-label {
+      color: #696a6d;
+      font-size: 0.82rem;
+      font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.04em;
-      font-size: 0.7rem;
-      margin-bottom: 8px !important;
     }
-    .site-footer a { color: #003399; text-decoration: none; }
-    .site-footer a:hover { text-decoration: underline; }
-    .footer-meta {
-      margin: 32px 0 0;
-      padding-top: 16px;
-      border-top: 1px solid #f0f1f3;
-      color: #909192;
-      font-size: 0.75rem;
+    .overview-text {
+      max-width: 720px;
+      color: #2a2a2d;
+      font-size: 1rem;
+      line-height: 1.65;
     }
+    .overview-text p { margin: 0 0 16px; }
+    .overview-text a { color: #003399; text-decoration: none; }
+    .overview-text a:hover { text-decoration: underline; }
+    .cta-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+    }
+    .cta {
+      display: inline-block;
+      padding: 12px 22px;
+      border-radius: 10px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+    .cta-primary {
+      background: #003399;
+      color: #ffffff;
+    }
+    .cta-primary:hover { background: #002266; }
+    .cta-secondary {
+      background: #ffffff;
+      color: #003399;
+      border: 1px solid #003399;
+    }
+    .cta-secondary:hover { background: #dbe4ff; }
   </style>
 </head>
 <body>
@@ -657,10 +768,39 @@
       <div class="disclaimer"><strong>Research demo only.</strong> Not a medical device. Not for clinical use, diagnosis, or treatment decisions. Trained on public research datasets (CheXpert, TBX11K); accuracy may drop sharply on X-rays from other hospitals or equipment. Do not use predictions here for any medical decision. See <a href="https://anichlabs.com" target="_blank" rel="noopener">project notes</a> for details.</div>
     </div>
 
-    <section data-tab-content="overview" class="tab-pane">
-      <h1 class="hero-title">Chest X-ray classification</h1>
-      <p class="hero-sub">A production MLOps case study by AnichLabs OÜ.</p>
-      <p class="tab-placeholder">Overview content coming next.</p>
+    <section data-tab-content="overview" class="tab-pane overview-pane">
+      <h1 class="hero-title">Chest X-ray classification, deployed.</h1>
+      <p class="hero-sub">A portfolio MLOps case study: eight PyTorch models trained on public research data, served behind a containerised FastAPI service, deployed on a single Hetzner VPS with auto-HTTPS, CI/CD, and live observability.</p>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-value">8</div>
+          <div class="stat-label">Trained models</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">99.93<span class="stat-unit">%</span></div>
+          <div class="stat-label">Best test accuracy</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">123<span class="stat-unit">ms</span></div>
+          <div class="stat-label">Avg CPU inference</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">1</div>
+          <div class="stat-label">VPS, 6.49 EUR/mo</div>
+        </div>
+      </div>
+
+      <div class="overview-text">
+        <p>This page is one project under <a href="https://anichlabs.com" target="_blank" rel="noopener">AnichLabs OÜ</a>, an Estonian software and AI company. The classifier itself comes from MSc research at CCT College Dublin and a paper submitted to IMVIP 2026; the demo you can interact with here is the production engineering layer built on top of that research.</p>
+        <p>Four CNN architectures (MobileNetV2, EfficientNet-B0, ResNet-50, and a custom Victorio network) are each trained in two normalisation domains (CheXpert and ImageNet), giving eight checkpoints that ship inside one FastAPI container. The Demo section lets you upload an X-ray or pick a sample and see all relevant metadata, including model confidence and per-class probabilities. The Results section shows test-set accuracy across all eight models, and the Deployment section surfaces live operational metrics straight from the running container.</p>
+        <p>Everything here, from the container to the auto-renewing TLS certificate to the dashboard you are looking at, is hand-built, deliberately boring, and meant to demonstrate what a senior MLOps deployment looks like at portfolio scale.</p>
+      </div>
+
+      <div class="cta-row">
+        <a class="cta cta-primary" href="#demo">Try the demo</a>
+        <a class="cta cta-secondary" href="#deployment">See the deployment</a>
+      </div>
     </section>
 
     <div data-tab-content="demo">
@@ -868,25 +1008,48 @@
   </div>
 
     <footer class="site-footer">
-      <div class="footer-inner">
-        <div class="footer-block">
-          <p class="footer-label">Built by</p>
-          <p>Chris Anich, <a href="https://anichlabs.com" target="_blank" rel="noopener">AnichLabs OÜ</a></p>
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="footer-logo" href="https://anichlabs.com" target="_blank" rel="noopener">
+            <span class="brand-anich">Anich</span><span class="brand-labs">Labs</span><span class="brand-ou"> OÜ</span>
+          </a>
+          <p class="footer-desc">
+            Built by Christopher Anich. This is a portfolio MLOps case study by
+            AnichLabs OÜ, an Estonian software and AI company. The
+            underlying research is based on MSc work at CCT College Dublin and
+            an accompanying paper submitted to IMVIP 2026.
+          </p>
+          <div class="footer-socials">
+            <a href="https://www.linkedin.com/in/dr-christopher-anich-598555232/" target="_blank" rel="noopener" aria-label="LinkedIn">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            </a>
+            <a href="mailto:contact@anichlabs.com" aria-label="Email">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </a>
+            <a href="https://github.com/chrisanich" target="_blank" rel="noopener" aria-label="GitHub">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+            </a>
+          </div>
         </div>
-        <div class="footer-block">
-          <p class="footer-label">Research context</p>
-          <p>Based on MSc research at CCT College Dublin. Formalised in a peer-reviewed paper accepted at IMVIP 2026.</p>
+        <div class="footer-col">
+          <h3>Datasets</h3>
+          <ul>
+            <li><a href="https://stanfordmlgroup.github.io/competitions/chexpert/" target="_blank" rel="noopener">CheXpert (Stanford)</a></li>
+            <li><a href="https://mmcheng.net/tb/" target="_blank" rel="noopener">TBX11K</a></li>
+          </ul>
         </div>
-        <div class="footer-block">
-          <p class="footer-label">Datasets</p>
-          <p>CheXpert (Stanford) and TBX11K. Used under their respective research-use agreements.</p>
-        </div>
-        <div class="footer-block">
-          <p class="footer-label">Contact</p>
-          <p>Project enquiries: <a href="mailto:chris@anichlabs.com">chris@anichlabs.com</a><br>Business enquiries: <a href="mailto:contact@anichlabs.com">contact@anichlabs.com</a><br>Code repository: available on request</p>
+        <div class="footer-col">
+          <h3>Contact</h3>
+          <ul>
+            <li><a href="mailto:contact@anichlabs.com">contact@anichlabs.com</a></li>
+            <li><a href="https://calendly.com/chris-anichlabs/30min" target="_blank" rel="noopener">Book a call</a></li>
+          </ul>
         </div>
       </div>
-      <p class="footer-meta">© 2026 AnichLabs OÜ. Research demonstration, not a medical device.</p>
+      <div class="footer-bottom">
+        <p>© 2026 AnichLabs OÜ. Research demonstration, not a medical device.</p>
+        <p>Registered in Estonia, EU</p>
+      </div>
     </footer>
   </div>
 
