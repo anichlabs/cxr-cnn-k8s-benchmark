@@ -550,6 +550,12 @@ async def predict(file: UploadFile = File(...), model: str = Query(default="mobi
     # int() converts to integer (0, 1, or 2).
     pred_idx = int(logits.argmax(dim=1).item())
 
+    # Softmax over the logits so we can show per-class probabilities
+    # and the model's confidence in its top prediction. This is just
+    # for display in the UI; it does not change the prediction itself.
+    probs = torch.softmax(logits, dim=1).squeeze(0).tolist()
+    confidence = float(probs[pred_idx])
+
     # ----------------------------------------
     # 10. Convert numeric index to class name. 
     # ----------------------------------------
@@ -570,6 +576,8 @@ async def predict(file: UploadFile = File(...), model: str = Query(default="mobi
     return {
         "prediction_index": pred_idx,
         "prediction_class": pred_class,
+        "confidence": confidence,
+        "probabilities": {idx_to_class[i]: float(p) for i, p in enumerate(probs)},
         "model_name": model_metadata["model_name"],
         "architecture": model_metadata["architecture"],
         "domain": model_metadata["domain"],

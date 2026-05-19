@@ -13,6 +13,16 @@ Data Analytics:
 The deployment and MLOps components exist to support the analytics story: they provide a controlled environment to measure performance and scalability, rather than being an independent product.
 
 
+## Live demo
+
+A containerised inference service is publicly hosted at
+**[cxr.anichlabs.com](https://cxr.anichlabs.com)** as a portfolio
+demonstration of the deployment pipeline. The service serves all eight
+trained checkpoints behind FastAPI, with a static front-end for
+single-image prediction. The demo is for research illustration only
+and is not a medical device. Operational details are in
+[DEPLOY.md](DEPLOY.md).
+
 ## 1. Repository structure
 
 ```text

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Cpath fill=%22%2300B5AD%22 d=%22M32 8c-2 0-3 1-3 3v18c-4-3-9-5-14-5-3 0-5 2-5 5v18c0 5 4 9 9 9 4 0 8-3 9-7l1-4c1-2 2-3 3-3s2 1 3 3l1 4c1 4 5 7 9 7 5 0 9-4 9-9V29c0-3-2-5-5-5-5 0-10 2-14 5V11c0-2-1-3-3-3z%22/%3E%3C/svg%3E">
   <title>CXR Classifier Demo - AnichLabs</title>
   <style>
     * {
@@ -341,6 +342,44 @@
       border-color: #00B5AD;
       transform: scale(1.05);
     }
+    .about-demo {
+      margin-top: 20px;
+      padding: 12px 18px;
+      background: #e6f7f6;
+      border-left: 4px solid #00B5AD;
+      border-radius: 4px;
+      color: #0a4d4a;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .confidence-row {
+      margin-top: 12px;
+      font-size: 0.9rem;
+    }
+    .confidence-bar {
+      height: 6px;
+      background: #e5e5e5;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .confidence-fill {
+      height: 100%;
+      background: #00B5AD;
+      transition: width 0.4s ease;
+    }
   </style>
 </head>
 <body>
@@ -349,7 +388,10 @@
       <div class="logo">AnichLabs</div>
       <h1>CXR Classifier Demo</h1>
       <p>Multi-model chest X-ray classification with configurable AI models</p>
-      <div class="disclaimer"><strong>Research demo only.</strong> Not a medical device. Not for clinical use, diagnosis, or treatment decisions. Trained on public research datasets (CheXpert, TBX11K). See <a href="https://anichlabs.com" target="_blank" rel="noopener">project notes</a> for details.</div>
+      <div class="about-demo">
+        <strong>About this demo.</strong> A portfolio MLOps pipeline: containerised FastAPI service serving eight PyTorch checkpoints, behind Caddy reverse proxy with auto-HTTPS, deployed on a single Hetzner VPS with rootless Podman. The focus is the engineering and deployment, not the model.
+      </div>
+      <div class="disclaimer"><strong>Research demo only.</strong> Not a medical device. Not for clinical use, diagnosis, or treatment decisions. Trained on public research datasets (CheXpert, TBX11K); accuracy may drop sharply on X-rays from other hospitals or equipment. Do not use predictions here for any medical decision. See <a href="https://anichlabs.com" target="_blank" rel="noopener">project notes</a> for details.</div>
     </header>
 
     <div class="main-content">
@@ -504,6 +546,7 @@
           
           <div class="metadata">
             <p><strong>Model Used:</strong> <span id="modelName">—</span></p>
+            <div id="confidenceRow" class="confidence-row" style="display:none;"></div>
             <p><strong>Architecture:</strong> <span id="architecture">—</span></p>
             <p><strong>Training Domain:</strong> <span id="domain">—</span></p>
             <p><strong>Device:</strong> <span id="device">—</span></p>
@@ -581,6 +624,7 @@
         previewImage.src = e.target.result;
         previewImage.classList.add('show');
         predictBtn.disabled = false;
+        if (predictBtn.dataset.originalText) predictBtn.textContent = predictBtn.dataset.originalText;
       };
       reader.readAsDataURL(file);
     }
@@ -654,6 +698,15 @@
       document.getElementById('predictionClass').textContent = result.prediction_class;
       document.getElementById('predictionIndex').textContent = result.prediction_index;
       document.getElementById('modelName').textContent = result.model_name;
+      // Display confidence if present
+      const confEl = document.getElementById('confidenceRow');
+      if (result.confidence !== undefined) {
+        const pct = (result.confidence * 100).toFixed(1);
+        confEl.innerHTML = `<strong>Confidence:</strong> ${pct}%<div class="confidence-bar"><div class="confidence-fill" style="width:${pct}%"></div></div>`;
+        confEl.style.display = 'block';
+      } else {
+        confEl.style.display = 'none';
+      }
       document.getElementById('architecture').textContent = result.architecture;
       document.getElementById('domain').textContent = result.domain;
       document.getElementById('device').textContent = result.device;
