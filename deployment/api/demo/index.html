@@ -742,6 +742,116 @@
       border: 1px solid #003399;
     }
     .cta-secondary:hover { background: #dbe4ff; }
+    .arch-pane { padding-top: 16px; }
+    .section-sub {
+      color: #696a6d;
+      font-size: 1.05rem;
+      margin: 0 0 24px;
+    }
+    .arch-layout {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 32px;
+    }
+    @media (max-width: 720px) {
+      .arch-layout { grid-template-columns: 1fr; gap: 16px; }
+    }
+    .arch-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      position: sticky;
+      top: 92px;
+      align-self: start;
+      border-left: 1px solid #e2e2e4;
+      padding-left: 12px;
+    }
+    @media (max-width: 720px) {
+      .arch-nav {
+        position: static;
+        flex-direction: row;
+        overflow-x: auto;
+        border-left: none;
+        border-bottom: 1px solid #e2e2e4;
+        padding: 0 0 8px;
+        gap: 4px;
+        scrollbar-width: none;
+      }
+      .arch-nav::-webkit-scrollbar { display: none; }
+    }
+    .arch-nav-link {
+      color: #696a6d;
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 6px 8px;
+      border-radius: 6px;
+      transition: color 0.15s ease, background 0.15s ease;
+      white-space: nowrap;
+    }
+    .arch-nav-link:hover { color: #003399; background: #f5f5f5; }
+    .arch-nav-link.active { color: #003399; background: #dbe4ff; font-weight: 500; }
+    .arch-content { min-width: 0; }
+    .arch-block { margin-bottom: 56px; scroll-margin-top: 92px; }
+    .arch-block:last-child { margin-bottom: 0; }
+    .arch-h3 {
+      font-family: 'Bricolage Grotesque', 'Inter', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #000;
+      margin: 0 0 12px;
+    }
+    .arch-block p {
+      color: #2a2a2d;
+      font-size: 0.95rem;
+      line-height: 1.65;
+      max-width: 680px;
+      margin: 0 0 12px;
+    }
+    .arch-diagram {
+      background: #ffffff;
+      border: 1px solid #e2e2e4;
+      border-radius: 12px;
+      padding: 20px;
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+    .arch-diagram svg { width: 100%; height: auto; max-width: 760px; display: block; margin: 0 auto; }
+    .arch-caption { color: #696a6d; font-size: 0.85rem; margin-top: 8px !important; }
+    .arch-table-wrap { overflow-x: auto; margin-top: 16px; }
+    .arch-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    .arch-table th, .arch-table td {
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid #e2e2e4;
+      vertical-align: top;
+    }
+    .arch-table th {
+      color: #000;
+      font-weight: 600;
+      background: #f7f7f8;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .arch-table td:nth-child(2) { color: #003399; font-weight: 500; white-space: nowrap; }
+    .arch-table td { color: #2a2a2d; }
+    .arch-tree {
+      background: #f7f7f8;
+      border: 1px solid #e2e2e4;
+      border-radius: 12px;
+      padding: 16px 20px;
+      overflow-x: auto;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      font-size: 0.82rem;
+      line-height: 1.55;
+      color: #2a2a2d;
+      margin-top: 12px;
+    }
   </style>
 </head>
 <body>
@@ -967,9 +1077,272 @@
     </div>
 
     </div>
-    <section data-tab-content="architecture" class="tab-pane">
+    <section data-tab-content="architecture" class="tab-pane arch-pane">
       <h2 class="section-title">Architecture</h2>
-      <p class="tab-placeholder">Pipeline diagram, stack, and design rationale coming next.</p>
+      <p class="section-sub">How the demo is built, deployed, and operated.</p>
+
+      <div class="arch-layout">
+        <aside class="arch-nav" aria-label="Architecture sub-sections">
+          <a href="#pipeline" data-subnav="pipeline" class="arch-nav-link active">Pipeline</a>
+          <a href="#stack" data-subnav="stack" class="arch-nav-link">Stack</a>
+          <a href="#repo" data-subnav="repo" class="arch-nav-link">Repository</a>
+          <a href="#rationale" data-subnav="rationale" class="arch-nav-link">Rationale</a>
+        </aside>
+
+        <div class="arch-content">
+          <div data-subsection="pipeline" class="arch-block">
+            <h3 class="arch-h3">Pipeline</h3>
+            <p>Every request follows the same path from the public internet down to the model and back.</p>
+            <div class="arch-diagram">
+              <svg viewBox="0 0 760 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Request pipeline">
+                <defs>
+                  <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#003399"/>
+                  </marker>
+                </defs>
+                <style>
+                  .node { fill: #ffffff; stroke: #003399; stroke-width: 1.5; }
+                  .node-bg { fill: #dbe4ff; stroke: #003399; stroke-width: 1.5; }
+                  .lbl { font-family: 'Inter', sans-serif; font-size: 13px; fill: #000000; }
+                  .lbl-sm { font-family: 'Inter', sans-serif; font-size: 11px; fill: #696a6d; }
+                  .lbl-strong { font-weight: 600; }
+                  .link { stroke: #003399; stroke-width: 1.5; fill: none; }
+                  .container-box { fill: #f7f7f8; stroke: #c8c9cb; stroke-dasharray: 4 3; }
+                  .arch-pane { padding-top: 16px; }
+    .section-sub {
+      color: #696a6d;
+      font-size: 1.05rem;
+      margin: 0 0 24px;
+    }
+    .arch-layout {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 32px;
+    }
+    @media (max-width: 720px) {
+      .arch-layout { grid-template-columns: 1fr; gap: 16px; }
+    }
+    .arch-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      position: sticky;
+      top: 92px;
+      align-self: start;
+      border-left: 1px solid #e2e2e4;
+      padding-left: 12px;
+    }
+    @media (max-width: 720px) {
+      .arch-nav {
+        position: static;
+        flex-direction: row;
+        overflow-x: auto;
+        border-left: none;
+        border-bottom: 1px solid #e2e2e4;
+        padding: 0 0 8px;
+        gap: 4px;
+        scrollbar-width: none;
+      }
+      .arch-nav::-webkit-scrollbar { display: none; }
+    }
+    .arch-nav-link {
+      color: #696a6d;
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 6px 8px;
+      border-radius: 6px;
+      transition: color 0.15s ease, background 0.15s ease;
+      white-space: nowrap;
+    }
+    .arch-nav-link:hover { color: #003399; background: #f5f5f5; }
+    .arch-nav-link.active { color: #003399; background: #dbe4ff; font-weight: 500; }
+    .arch-content { min-width: 0; }
+    .arch-block { margin-bottom: 56px; scroll-margin-top: 92px; }
+    .arch-block:last-child { margin-bottom: 0; }
+    .arch-h3 {
+      font-family: 'Bricolage Grotesque', 'Inter', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #000;
+      margin: 0 0 12px;
+    }
+    .arch-block p {
+      color: #2a2a2d;
+      font-size: 0.95rem;
+      line-height: 1.65;
+      max-width: 680px;
+      margin: 0 0 12px;
+    }
+    .arch-diagram {
+      background: #ffffff;
+      border: 1px solid #e2e2e4;
+      border-radius: 12px;
+      padding: 20px;
+      overflow-x: auto;
+      margin: 16px 0;
+    }
+    .arch-diagram svg { width: 100%; height: auto; max-width: 760px; display: block; margin: 0 auto; }
+    .arch-caption { color: #696a6d; font-size: 0.85rem; margin-top: 8px !important; }
+    .arch-table-wrap { overflow-x: auto; margin-top: 16px; }
+    .arch-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    .arch-table th, .arch-table td {
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid #e2e2e4;
+      vertical-align: top;
+    }
+    .arch-table th {
+      color: #000;
+      font-weight: 600;
+      background: #f7f7f8;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .arch-table td:nth-child(2) { color: #003399; font-weight: 500; white-space: nowrap; }
+    .arch-table td { color: #2a2a2d; }
+    .arch-tree {
+      background: #f7f7f8;
+      border: 1px solid #e2e2e4;
+      border-radius: 12px;
+      padding: 16px 20px;
+      overflow-x: auto;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      font-size: 0.82rem;
+      line-height: 1.55;
+      color: #2a2a2d;
+      margin-top: 12px;
+    }
+  </style>
+
+                <text x="20" y="24" class="lbl lbl-strong">Request pipeline</text>
+
+                <!-- Browser -->
+                <rect class="node" x="20" y="50" width="120" height="60" rx="8"/>
+                <text x="80" y="80" text-anchor="middle" class="lbl lbl-strong">Browser</text>
+                <text x="80" y="98" text-anchor="middle" class="lbl-sm">visitor</text>
+
+                <path class="link" d="M 140 80 L 200 80" marker-end="url(#arrow)"/>
+                <text x="170" y="68" text-anchor="middle" class="lbl-sm">HTTPS</text>
+
+                <!-- Caddy -->
+                <rect class="node-bg" x="200" y="50" width="160" height="60" rx="8"/>
+                <text x="280" y="76" text-anchor="middle" class="lbl lbl-strong">Caddy 2.11</text>
+                <text x="280" y="94" text-anchor="middle" class="lbl-sm">TLS, HTTP/3, log, proxy</text>
+
+                <path class="link" d="M 360 80 L 420 80" marker-end="url(#arrow)"/>
+                <text x="390" y="68" text-anchor="middle" class="lbl-sm">127.0.0.1:8001</text>
+
+                <!-- Hetzner VPS outer -->
+                <rect class="container-box" x="15" y="135" width="730" height="200" rx="10"/>
+                <text x="30" y="155" class="lbl lbl-strong">Hetzner CX33 VPS, Ubuntu 24.04</text>
+                <text x="30" y="171" class="lbl-sm">UFW: 22 / 80 / 443 only. fail2ban. unattended-upgrades.</text>
+
+                <!-- Podman -->
+                <rect class="node" x="420" y="50" width="170" height="60" rx="8"/>
+                <text x="505" y="76" text-anchor="middle" class="lbl lbl-strong">Podman container</text>
+                <text x="505" y="94" text-anchor="middle" class="lbl-sm">rootless, port 8000</text>
+
+                <path class="link" d="M 505 110 L 505 175" marker-end="url(#arrow)"/>
+
+                <!-- FastAPI + uvicorn -->
+                <rect class="node-bg" x="420" y="180" width="170" height="60" rx="8"/>
+                <text x="505" y="206" text-anchor="middle" class="lbl lbl-strong">FastAPI + uvicorn</text>
+                <text x="505" y="224" text-anchor="middle" class="lbl-sm">/predict, /metrics, ...</text>
+
+                <path class="link" d="M 505 240 L 505 280" marker-end="url(#arrow)"/>
+
+                <!-- PyTorch models -->
+                <rect class="node-bg" x="420" y="285" width="170" height="40" rx="8"/>
+                <text x="505" y="310" text-anchor="middle" class="lbl">PyTorch CPU, 8 checkpoints</text>
+
+                <!-- systemd / Quadlet -->
+                <rect class="node" x="50" y="195" width="180" height="50" rx="8"/>
+                <text x="140" y="220" text-anchor="middle" class="lbl lbl-strong">systemd user unit</text>
+                <text x="140" y="236" text-anchor="middle" class="lbl-sm">cxr-api.service, linger</text>
+
+                <!-- GitHub Actions -->
+                <rect class="node" x="50" y="265" width="180" height="55" rx="8"/>
+                <text x="140" y="290" text-anchor="middle" class="lbl lbl-strong">GitHub Actions</text>
+                <text x="140" y="307" text-anchor="middle" class="lbl-sm">push -> ssh -> rebuild -> healthcheck</text>
+
+                <path class="link" d="M 230 220 L 420 220" stroke-dasharray="3 3"/>
+                <text x="325" y="212" text-anchor="middle" class="lbl-sm">starts container at boot</text>
+
+                <path class="link" d="M 230 292 L 420 75" stroke-dasharray="3 3"/>
+                <text x="380" y="160" class="lbl-sm">deploys on every push</text>
+              </svg>
+            </div>
+            <p class="arch-caption">A single VPS hosts everything: TLS terminator, rootless container, model inference. systemd brings the container back at boot (linger enabled), GitHub Actions deploys on every push to main, Caddy renews the Let's Encrypt certificate automatically.</p>
+          </div>
+
+          <div data-subsection="stack" class="arch-block">
+            <h3 class="arch-h3">Stack</h3>
+            <p>Each layer is a deliberate, boring, well-documented choice.</p>
+            <div class="arch-table-wrap">
+              <table class="arch-table">
+                <thead>
+                  <tr>
+                    <th>Layer</th>
+                    <th>Choice</th>
+                    <th>Why</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Server</td><td>Hetzner CX33</td><td>Cheapest x86 VPS that comfortably hosts PyTorch CPU inference. EU jurisdiction.</td></tr>
+                  <tr><td>OS</td><td>Ubuntu 24.04 LTS</td><td>Stable, well-documented, Podman 4.9 in repos.</td></tr>
+                  <tr><td>Runtime</td><td>Podman rootless</td><td>No daemon, smaller blast radius. K8s migration is one command away.</td></tr>
+                  <tr><td>Compose</td><td>podman compose (Compose v2 plugin)</td><td>Same YAML works locally and on the server.</td></tr>
+                  <tr><td>Reverse proxy</td><td>Caddy 2.11 (host)</td><td>Zero-config HTTPS, HTTP/3 by default.</td></tr>
+                  <tr><td>TLS</td><td>Let's Encrypt via Caddy ACME</td><td>Auto-renewed every 60 days.</td></tr>
+                  <tr><td>Supervision</td><td>systemd user unit + linger</td><td>Standard, observable, survives reboots.</td></tr>
+                  <tr><td>CI/CD</td><td>GitHub Actions</td><td>push -> rebuild -> healthcheck.</td></tr>
+                  <tr><td>Observability</td><td>Prometheus inside the app + a small JSON endpoint</td><td>Live dashboard without a full Grafana stack.</td></tr>
+                  <tr><td>Firewall</td><td>UFW default-deny + fail2ban</td><td>Only 22 / 80 / 443 exposed.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div data-subsection="repo" class="arch-block">
+            <h3 class="arch-h3">Repository</h3>
+            <p>Folders relevant to deployment. Model checkpoints and offline wheels are gitignored and transferred out-of-band.</p>
+            <pre class="arch-tree">cxr-cnn-k8s-benchmark/
+├─ podman-compose.yml                       # base compose, shared
+├─ deployment/
+│  ├─ compose.dev.yml                       # dev override (public port, --reload)
+│  ├─ compose.prod.yml                      # prod override (localhost-only, healthcheck)
+│  └─ api/
+│     ├─ Containerfile.cpu                  # CPU image recipe
+│     ├─ requirements-cpu.txt
+│     ├─ wheels-cpu/                        # offline pip wheels (gitignored)
+│     ├─ app/                               # FastAPI source
+│     ├─ config/                            # JSON: models, preprocessing, evaluation
+│     └─ demo/                              # the page you are looking at
+├─ experiments/
+│  ├─ checkpoints/                          # 8 .pt files (gitignored)
+│  └─ results/                              # training and evaluation outputs
+├─ reports/                                  # paper figures and tables
+├─ .github/workflows/deploy.yml             # CI/CD pipeline
+├─ DEPLOY.md                                # operational reference
+└─ README.md</pre>
+          </div>
+
+          <div data-subsection="rationale" class="arch-block">
+            <h3 class="arch-h3">Rationale</h3>
+            <p>The design optimises for three things in order: <strong>reliability</strong>, <strong>cost</strong>, and <strong>portfolio clarity</strong>.</p>
+            <p>Reliability comes from boring choices. systemd, Caddy, Podman, UFW, fail2ban: all of them are documented to death and behave predictably when something goes wrong. Nothing in the stack requires me to read a Discord channel to debug.</p>
+            <p>Cost is held down by running a single, small VPS (4 vCPU, 8 GB, 80 GB SSD at €6.49 per month) with the API container bound to localhost. The reverse proxy is the only thing the public internet can reach, and it handles TLS, HTTP/3, gzip, and the access log in one binary.</p>
+            <p>Portfolio clarity drives the decision not to deploy Grafana, Prometheus servers, or a full K8s cluster for one demo. They would be overkill, expensive, and would obscure the engineering behind layers of infrastructure no one would inspect. Instead, the app instruments itself, exposes its metrics, and the page you are reading renders them client-side. Same signal at one-tenth the operational weight.</p>
+            <p>The same pattern repeats for every other portfolio app on this server. Add a subdomain in DNS, add a one-line block in the Caddyfile, deploy another rootless container behind it. Multi-tenancy without Kubernetes.</p>
+          </div>
+        </div>
+      </div>
     </section>
 
     <div data-tab-content="results">
@@ -1286,18 +1659,40 @@
     // ----- One-page scroll navigation -----
     const SECTIONS = ['overview', 'demo', 'architecture', 'results', 'deployment'];
 
-    // Smooth-scroll to the section when a nav tab is clicked
+    // Smooth-scroll for top-nav tabs AND in-page anchor links (CTAs, sub-nav)
+    function smoothScrollToId(id) {
+      // Try section-level target first, then any element with that id, then sub-nav target
+      let target = document.querySelector('[data-tab-content="' + id + '"]');
+      if (!target) target = document.getElementById(id);
+      if (!target) target = document.querySelector('[data-subsection="' + id + '"]');
+      if (!target) return false;
+      const headerOffset = document.querySelector('.site-header').offsetHeight + 12;
+      const top = target.getBoundingClientRect().top + window.scrollY - headerOffset;
+      window.scrollTo({ top, behavior: 'smooth' });
+      return true;
+    }
+
     document.querySelectorAll('.site-tab').forEach(el => {
       el.addEventListener('click', (e) => {
         e.preventDefault();
         const id = el.dataset.tab;
-        const target = document.querySelector('[data-tab-content="' + id + '"]');
-        if (!target) return;
-        const headerOffset = document.querySelector('.site-header').offsetHeight + 12;
-        const top = target.getBoundingClientRect().top + window.scrollY - headerOffset;
-        window.scrollTo({ top, behavior: 'smooth' });
-        history.pushState({ section: id }, '', '#' + id);
+        if (smoothScrollToId(id)) {
+          history.pushState({ section: id }, '', '#' + id);
+        }
       });
+    });
+
+    // Generic in-page anchor handler for CTAs and sub-nav inside any section.
+    // Captures any <a href="#something"> that is NOT a site-tab.
+    document.addEventListener('click', (e) => {
+      const a = e.target.closest('a[href^="#"]');
+      if (!a || a.classList.contains('site-tab')) return;
+      const id = a.getAttribute('href').slice(1);
+      if (!id) return;
+      if (smoothScrollToId(id)) {
+        e.preventDefault();
+        history.pushState({ section: id }, '', '#' + id);
+      }
     });
 
     // Update the active tab as the user scrolls
@@ -1331,6 +1726,25 @@
         }
       }
     });
+
+  
+    // ----- Architecture sub-nav highlight as you scroll within the section -----
+    (function setupArchSubnav() {
+      const subBlocks = Array.from(document.querySelectorAll('[data-subsection]'));
+      const subLinks = Array.from(document.querySelectorAll('.arch-nav-link'));
+      if (!subBlocks.length || !subLinks.length) return;
+      function updateActive() {
+        const headerH = document.querySelector('.site-header').offsetHeight + 100;
+        let current = subBlocks[0].dataset.subsection;
+        for (const block of subBlocks) {
+          const rect = block.getBoundingClientRect();
+          if (rect.top <= headerH) current = block.dataset.subsection;
+        }
+        subLinks.forEach(l => l.classList.toggle('active', l.dataset.subnav === current));
+      }
+      window.addEventListener('scroll', updateActive, { passive: true });
+      updateActive();
+    })();
 
   </script>
 </body>
