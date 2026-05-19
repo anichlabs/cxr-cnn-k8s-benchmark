@@ -529,19 +529,99 @@
       font-variant-numeric: tabular-nums;
       text-align: right;
     }
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: saturate(180%) blur(12px);
+      -webkit-backdrop-filter: saturate(180%) blur(12px);
+      border-bottom: 1px solid #e2e2e4;
+      margin: -40px -40px 0 -40px;
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 14px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .site-logo {
+      text-decoration: none;
+      font-size: 1.15rem;
+      font-family: 'Bricolage Grotesque', 'Inter', sans-serif;
+      letter-spacing: -0.01em;
+      display: inline-block;
+      transition: opacity 0.15s ease;
+    }
+    .site-logo:hover { opacity: 0.7; }
+    .site-tabs {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .site-tabs::-webkit-scrollbar { display: none; }
+    .site-tab {
+      flex: none;
+      padding: 10px 14px;
+      font-size: 0.9rem;
+      color: #696a6d;
+      text-decoration: none;
+      font-weight: 500;
+      border-bottom: 2px solid transparent;
+      transition: color 0.15s ease, border-color 0.15s ease;
+      white-space: nowrap;
+    }
+    .site-tab:hover { color: #000000; }
+    .site-tab.active {
+      color: #003399;
+      border-bottom-color: #003399;
+    }
+    .persistent-banner {
+      max-width: 1100px;
+      margin: 16px auto;
+    }
+    .persistent-banner .about-demo,
+    .persistent-banner .disclaimer {
+      margin-top: 8px;
+    }
+    /* Hide old in-content logo since the sticky one is now used */
+    .main-content .logo,
+    .container > .logo { display: none; }
+    [data-tab-content] { display: none; }
+    [data-tab-content].active { display: block; }
   </style>
 </head>
 <body>
   <div class="container">
-    <header>
-      <div class="logo"><span class="brand-anich">Anich</span><span class="brand-labs">Labs</span><span class="brand-ou"> OÜ</span></div>
-      <h1>CXR Classifier Demo</h1>
-      <p>Multi-model chest X-ray classification with configurable AI models</p>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="site-logo" href="https://anichlabs.com" target="_blank" rel="noopener" aria-label="AnichLabs homepage">
+          <span class="brand-anich">Anich</span><span class="brand-labs">Labs</span><span class="brand-ou"> OÜ</span>
+        </a>
+        <nav class="site-tabs" role="tablist" aria-label="Sections">
+          <a class="site-tab" data-tab="overview" href="#overview" role="tab">Overview</a>
+          <a class="site-tab" data-tab="demo" href="#demo" role="tab">Demo</a>
+          <a class="site-tab" data-tab="architecture" href="#architecture" role="tab">Architecture</a>
+          <a class="site-tab" data-tab="results" href="#results" role="tab">Results</a>
+          <a class="site-tab" data-tab="deployment" href="#deployment" role="tab">Deployment</a>
+          <a class="site-tab" data-tab="about" href="#about" role="tab">About</a>
+        </nav>
+      </div>
+    </header>
+
+    <div class="persistent-banner">
       <div class="about-demo">
         <strong>About this demo.</strong> A portfolio MLOps pipeline: containerised FastAPI service serving eight PyTorch checkpoints, behind Caddy reverse proxy with auto-HTTPS, deployed on a single Hetzner VPS with rootless Podman. The focus is the engineering and deployment, not the model.
       </div>
       <div class="disclaimer"><strong>Research demo only.</strong> Not a medical device. Not for clinical use, diagnosis, or treatment decisions. Trained on public research datasets (CheXpert, TBX11K); accuracy may drop sharply on X-rays from other hospitals or equipment. Do not use predictions here for any medical decision. See <a href="https://anichlabs.com" target="_blank" rel="noopener">project notes</a> for details.</div>
-    </header>
+    </div>
+
+    <!-- TAB_INSERTION_POINT_OVERVIEW: h1 + tagline + Overview content go here in Stage 4 -->
 
     <div class="main-content">
       <div class="upload-section">
@@ -965,6 +1045,47 @@
       }
     }
     loadBenchmark();
+
+  
+    // ----- Tab routing -----
+    const VALID_TABS = ['overview', 'demo', 'architecture', 'results', 'deployment', 'about'];
+    const DEFAULT_TAB = 'overview';
+
+    function getTabFromUrl() {
+      const raw = (window.location.hash || '').replace(/^#/, '');
+      return VALID_TABS.includes(raw) ? raw : DEFAULT_TAB;
+    }
+
+    function setActiveTab(name, updateHistory = false) {
+      if (!VALID_TABS.includes(name)) name = DEFAULT_TAB;
+      document.querySelectorAll('.site-tab').forEach(el => {
+        el.classList.toggle('active', el.dataset.tab === name);
+        el.setAttribute('aria-selected', el.dataset.tab === name ? 'true' : 'false');
+      });
+      document.querySelectorAll('[data-tab-content]').forEach(el => {
+        el.classList.toggle('active', el.dataset.tabContent === name);
+      });
+      if (updateHistory) {
+        const newHash = '#' + name;
+        if (window.location.hash !== newHash) {
+          history.pushState({ tab: name }, '', newHash);
+        }
+      }
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+
+    document.querySelectorAll('.site-tab').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        setActiveTab(el.dataset.tab, true);
+      });
+    });
+
+    window.addEventListener('popstate', () => {
+      setActiveTab(getTabFromUrl(), false);
+    });
+
+    setActiveTab(getTabFromUrl(), false);
 
   </script>
 </body>
