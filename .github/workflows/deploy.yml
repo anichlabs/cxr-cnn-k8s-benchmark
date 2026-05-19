@@ -1,0 +1,50 @@
+name: Deploy to portfolio-01
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:        # allow manual trigger from the Actions tab
+
+# Only one deploy at a time; cancel any in-flight if a new push arrives
+concurrency:
+  group: deploy-portfolio-01
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Pull and redeploy on server
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+              -o IdentitiesOnly=yes \
+              ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} \
+              'set -e
+               cd ~/apps/cxr-cnn-k8s-benchmark
+               git pull --ff-only
+               podman compose -f podman-compose.yml -f deployment/compose.prod.yml build
+               podman compose -f podman-compose.yml -f deployment/compose.prod.yml up -d
+               sleep 70
+               podman ps --format "{{.Names}} {{.Status}}"'
+
+      - name: Public health check
+        run: |
+          set -e
+          for i in 1 2 3 4 5; do
+            if curl -fsS https://cxr.anichlabs.com/health > /dev/null; then
+              echo "Health check passed on attempt $i"
+              exit 0
+            fi
+            echo "Attempt $i failed, retrying in 10s..."
+            sleep 10
+          done
+          echo "Health check failed after 5 attempts"
+          exit 1
