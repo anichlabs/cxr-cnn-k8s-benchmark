@@ -592,8 +592,11 @@
     /* Hide old in-content logo since the sticky one is now used */
     .main-content .logo,
     .container > .logo { display: none; }
-    [data-tab-content] { display: none; }
-    [data-tab-content].active { display: block; }
+    .tab-pane { max-width: 1100px; margin: 32px auto; padding: 0 8px; }
+    .hero-title { font-family: 'Bricolage Grotesque', 'Inter', sans-serif; font-size: 2.2rem; font-weight: 600; letter-spacing: -0.025em; color: #000; margin: 0 0 8px; }
+    .hero-sub { color: #696a6d; font-size: 1.1rem; margin: 0 0 24px; }
+    .section-title { font-family: 'Bricolage Grotesque', 'Inter', sans-serif; font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em; color: #000; margin: 0 0 12px; }
+    .tab-placeholder { color: #909192; font-size: 0.95rem; }
   </style>
 </head>
 <body>
@@ -621,8 +624,13 @@
       <div class="disclaimer"><strong>Research demo only.</strong> Not a medical device. Not for clinical use, diagnosis, or treatment decisions. Trained on public research datasets (CheXpert, TBX11K); accuracy may drop sharply on X-rays from other hospitals or equipment. Do not use predictions here for any medical decision. See <a href="https://anichlabs.com" target="_blank" rel="noopener">project notes</a> for details.</div>
     </div>
 
-    <!-- TAB_INSERTION_POINT_OVERVIEW: h1 + tagline + Overview content go here in Stage 4 -->
+    <section data-tab-content="overview" class="tab-pane">
+      <h1 class="hero-title">Chest X-ray classification</h1>
+      <p class="hero-sub">A production MLOps case study by AnichLabs OÜ.</p>
+      <p class="tab-placeholder">Overview content coming next.</p>
+    </section>
 
+    <div data-tab-content="demo">
     <div class="main-content">
       <div class="upload-section">
         <h2>Upload Image</h2>
@@ -785,6 +793,13 @@
       </div>
     </div>
 
+    </div>
+    <section data-tab-content="architecture" class="tab-pane">
+      <h2 class="section-title">Architecture</h2>
+      <p class="tab-placeholder">Pipeline diagram, stack, and design rationale coming next.</p>
+    </section>
+
+    <div data-tab-content="results">
     <section class="benchmark-section">
       <h2 class="benchmark-title">Benchmark results</h2>
       <p class="benchmark-sub">Test-set accuracy of all eight trained models. From the production evaluation pipeline.</p>
@@ -793,6 +808,8 @@
       </div>
     </section>
 
+    </div>
+    <div data-tab-content="deployment">
     <section class="dashboard-section">
       <h2 class="dashboard-title">Live metrics</h2>
       <p class="dashboard-sub">Live from this server. Refreshes every 10 seconds.</p>
@@ -814,6 +831,12 @@
           <div class="metric-value" id="metric-models">—</div>
         </div>
       </div>
+    </section>
+  </div>
+
+    <section data-tab-content="about" class="tab-pane">
+      <h2 class="section-title">About</h2>
+      <p class="tab-placeholder">Project context, paper citation, and contact coming next.</p>
     </section>
   </div>
 
@@ -1047,42 +1070,54 @@
     loadBenchmark();
 
   
-    // ----- Tab routing -----
-    const VALID_TABS = ['overview', 'demo', 'architecture', 'results', 'deployment', 'about'];
-    const DEFAULT_TAB = 'overview';
+    // ----- One-page scroll navigation -----
+    const SECTIONS = ['overview', 'demo', 'architecture', 'results', 'deployment', 'about'];
 
-    function getTabFromUrl() {
-      const raw = (window.location.hash || '').replace(/^#/, '');
-      return VALID_TABS.includes(raw) ? raw : DEFAULT_TAB;
-    }
-
-    function setActiveTab(name, updateHistory = false) {
-      if (!VALID_TABS.includes(name)) name = DEFAULT_TAB;
-      document.querySelectorAll('.site-tab').forEach(el => {
-        el.classList.toggle('active', el.dataset.tab === name);
-        el.setAttribute('aria-selected', el.dataset.tab === name ? 'true' : 'false');
-      });
-      document.querySelectorAll('[data-tab-content]').forEach(el => {
-        el.classList.toggle('active', el.dataset.tabContent === name);
-      });
-      if (updateHistory) {
-        const newHash = '#' + name;
-        if (window.location.hash !== newHash) {
-          history.pushState({ tab: name }, '', newHash);
-        }
-      }
-      window.scrollTo({ top: 0, behavior: 'instant' });
-    }
-
+    // Smooth-scroll to the section when a nav tab is clicked
     document.querySelectorAll('.site-tab').forEach(el => {
       el.addEventListener('click', (e) => {
         e.preventDefault();
-        setActiveTab(el.dataset.tab, true);
+        const id = el.dataset.tab;
+        const target = document.querySelector('[data-tab-content="' + id + '"]');
+        if (!target) return;
+        const headerOffset = document.querySelector('.site-header').offsetHeight + 12;
+        const top = target.getBoundingClientRect().top + window.scrollY - headerOffset;
+        window.scrollTo({ top, behavior: 'smooth' });
+        history.pushState({ section: id }, '', '#' + id);
       });
     });
 
-    window.addEventListener('popstate', () => {
-      setActiveTab(getTabFromUrl(), false);
+    // Update the active tab as the user scrolls
+    const sectionEls = SECTIONS
+      .map(id => document.querySelector('[data-tab-content="' + id + '"]'))
+      .filter(Boolean);
+
+    function updateActiveOnScroll() {
+      const headerH = document.querySelector('.site-header').offsetHeight + 40;
+      let current = SECTIONS[0];
+      for (const el of sectionEls) {
+        const rect = el.getBoundingClientRect();
+        if (rect.top <= headerH) current = el.dataset.tabContent;
+      }
+      document.querySelectorAll('.site-tab').forEach(el => {
+        el.classList.toggle('active', el.dataset.tab === current);
+      });
+    }
+
+    window.addEventListener('scroll', updateActiveOnScroll, { passive: true });
+    window.addEventListener('load', () => {
+      updateActiveOnScroll();
+      // Handle initial #fragment so deep-links land on the right section
+      if (window.location.hash) {
+        const id = window.location.hash.replace(/^#/, '');
+        const target = document.querySelector('[data-tab-content="' + id + '"]');
+        if (target) {
+          const headerOffset = document.querySelector('.site-header').offsetHeight + 12;
+          const top = target.getBoundingClientRect().top + window.scrollY - headerOffset;
+          window.scrollTo({ top, behavior: 'instant' });
+        }
+      }
+    });
     });
 
     setActiveTab(getTabFromUrl(), false);
