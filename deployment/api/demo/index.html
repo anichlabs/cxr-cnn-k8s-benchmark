@@ -707,7 +707,7 @@
 
     <section class="benchmark-section">
       <h2 class="benchmark-title">Benchmark results</h2>
-      <p class="benchmark-sub">Test-set accuracy of all eight trained models. From the MSc thesis evaluation pipeline.</p>
+      <p class="benchmark-sub">Test-set accuracy of all eight trained models. From the production evaluation pipeline.</p>
       <div class="benchmark-list" id="benchmark-list">
         <p class="benchmark-loading">Loading…</p>
       </div>
@@ -934,14 +934,15 @@
         if (!r.ok) throw new Error('http ' + r.status);
         const data = await r.json();
         if (data.error || !data.results) throw new Error(data.error || 'no results');
-        const accs = data.results.map(d => d.accuracy);
-        const minAcc = Math.min(...accs);
-        const maxAcc = Math.max(...accs);
-        const range = Math.max(maxAcc - minAcc, 0.001);
+        // Fixed scale 0.90 -> 1.00: honest distance for ~92% Victorio
+        // while still showing the spread between the top models.
+        const scaleMin = 0.90;
+        const scaleMax = 1.00;
+        const range = scaleMax - scaleMin;
         container.innerHTML = '';
         data.results.forEach((row, i) => {
           const pctTrue = (row.accuracy * 100).toFixed(2);
-          const pctBar = ((row.accuracy - minAcc) / range) * 100;
+          const pctBar = Math.max(0, Math.min(100, ((row.accuracy - scaleMin) / range) * 100));
           const tagClass = row.normalisation.toLowerCase() === 'cxr' ? 'cxr' : 'imagenet';
           const div = document.createElement('div');
           div.className = 'bench-row';
