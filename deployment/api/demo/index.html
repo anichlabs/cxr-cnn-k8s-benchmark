@@ -597,6 +597,40 @@
     .hero-sub { color: #696a6d; font-size: 1.1rem; margin: 0 0 24px; }
     .section-title { font-family: 'Bricolage Grotesque', 'Inter', sans-serif; font-size: 1.5rem; font-weight: 600; letter-spacing: -0.02em; color: #000; margin: 0 0 12px; }
     .tab-placeholder { color: #909192; font-size: 0.95rem; }
+    .site-footer {
+      max-width: 1100px;
+      margin: 80px auto 40px;
+      padding: 32px 8px 0;
+      border-top: 1px solid #e2e2e4;
+      color: #696a6d;
+      font-size: 0.85rem;
+    }
+    .footer-inner {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+    @media (max-width: 720px) {
+      .footer-inner { grid-template-columns: repeat(2, 1fr); }
+    }
+    .footer-block p { margin: 0 0 4px; line-height: 1.5; }
+    .footer-label {
+      color: #000;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-size: 0.7rem;
+      margin-bottom: 8px !important;
+    }
+    .site-footer a { color: #003399; text-decoration: none; }
+    .site-footer a:hover { text-decoration: underline; }
+    .footer-meta {
+      margin: 32px 0 0;
+      padding-top: 16px;
+      border-top: 1px solid #f0f1f3;
+      color: #909192;
+      font-size: 0.75rem;
+    }
   </style>
 </head>
 <body>
@@ -612,7 +646,6 @@
           <a class="site-tab" data-tab="architecture" href="#architecture" role="tab">Architecture</a>
           <a class="site-tab" data-tab="results" href="#results" role="tab">Results</a>
           <a class="site-tab" data-tab="deployment" href="#deployment" role="tab">Deployment</a>
-          <a class="site-tab" data-tab="about" href="#about" role="tab">About</a>
         </nav>
       </div>
     </header>
@@ -834,10 +867,27 @@
     </section>
   </div>
 
-    <section data-tab-content="about" class="tab-pane">
-      <h2 class="section-title">About</h2>
-      <p class="tab-placeholder">Project context, paper citation, and contact coming next.</p>
-    </section>
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-block">
+          <p class="footer-label">Built by</p>
+          <p>Chris Anich, <a href="https://anichlabs.com" target="_blank" rel="noopener">AnichLabs OÜ</a></p>
+        </div>
+        <div class="footer-block">
+          <p class="footer-label">Research context</p>
+          <p>Based on MSc research at CCT College Dublin. Formalised in a peer-reviewed paper accepted at IMVIP 2026.</p>
+        </div>
+        <div class="footer-block">
+          <p class="footer-label">Datasets</p>
+          <p>CheXpert (Stanford) and TBX11K. Used under their respective research-use agreements.</p>
+        </div>
+        <div class="footer-block">
+          <p class="footer-label">Contact</p>
+          <p>Project enquiries: <a href="mailto:chris@anichlabs.com">chris@anichlabs.com</a><br>Business enquiries: <a href="mailto:contact@anichlabs.com">contact@anichlabs.com</a><br>Code repository: available on request</p>
+        </div>
+      </div>
+      <p class="footer-meta">© 2026 AnichLabs OÜ. Research demonstration, not a medical device.</p>
+    </footer>
   </div>
 
   <script>
@@ -1071,7 +1121,7 @@
 
   
     // ----- One-page scroll navigation -----
-    const SECTIONS = ['overview', 'demo', 'architecture', 'results', 'deployment', 'about'];
+    const SECTIONS = ['overview', 'demo', 'architecture', 'results', 'deployment'];
 
     // Smooth-scroll to the section when a nav tab is clicked
     document.querySelectorAll('.site-tab').forEach(el => {
