@@ -402,6 +402,60 @@
     .brand-anich { color: #000000; font-weight: 700; }
     .brand-labs { color: #003399; font-weight: 700; }
     .brand-ou { color: #909192; font-weight: 400; font-size: 0.85em; margin-left: 2px; }
+    .dashboard-section {
+      margin-top: 40px;
+      padding-top: 32px;
+      border-top: 1px solid #e2e2e4;
+    }
+    .dashboard-title {
+      font-family: 'Bricolage Grotesque', 'Inter', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #000000;
+      margin: 0 0 4px 0;
+    }
+    .dashboard-sub {
+      color: #696a6d;
+      font-size: 0.85rem;
+      margin: 0 0 20px 0;
+    }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 720px) {
+      .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .metric-tile {
+      background: #ffffff;
+      border: 1px solid #e2e2e4;
+      border-radius: 12px;
+      padding: 16px 18px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+    .metric-tile:hover {
+      transform: translateY(-1px);
+      border-color: #003399;
+      box-shadow: 0 1px 2px 0 rgba(0,0,0,0.04);
+    }
+    .metric-label {
+      color: #696a6d;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+    }
+    .metric-value {
+      font-family: 'Bricolage Grotesque', 'Inter', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: #000000;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+    }
   </style>
 </head>
 <body>
@@ -577,6 +631,29 @@
         </div>
       </div>
     </div>
+
+    <section class="dashboard-section">
+      <h2 class="dashboard-title">Live metrics</h2>
+      <p class="dashboard-sub">Live from this server. Refreshes every 10 seconds.</p>
+      <div class="dashboard-grid">
+        <div class="metric-tile">
+          <div class="metric-label">Uptime</div>
+          <div class="metric-value" id="metric-uptime">—</div>
+        </div>
+        <div class="metric-tile">
+          <div class="metric-label">Avg inference</div>
+          <div class="metric-value" id="metric-latency">—</div>
+        </div>
+        <div class="metric-tile">
+          <div class="metric-label">Memory in use</div>
+          <div class="metric-value" id="metric-memory">—</div>
+        </div>
+        <div class="metric-tile">
+          <div class="metric-label">Models loaded</div>
+          <div class="metric-value" id="metric-models">—</div>
+        </div>
+      </div>
+    </section>
   </div>
 
   <script>
@@ -740,6 +817,33 @@
       errorMsg.textContent = message;
       errorMsg.classList.add('show');
     }
+  
+    // ----- Live metrics dashboard -----
+    function formatUptime(seconds) {
+      if (seconds < 60) return seconds + 's';
+      const m = Math.floor(seconds / 60);
+      if (m < 60) return m + 'm';
+      const h = Math.floor(m / 60);
+      if (h < 24) return h + 'h ' + (m % 60) + 'm';
+      const d = Math.floor(h / 24);
+      return d + 'd ' + (h % 24) + 'h';
+    }
+    async function refreshDashboard() {
+      try {
+        const r = await fetch('/dashboard-metrics', { cache: 'no-store' });
+        if (!r.ok) return;
+        const m = await r.json();
+        document.getElementById('metric-uptime').textContent = formatUptime(m.uptime_seconds);
+        document.getElementById('metric-latency').textContent = m.avg_inference_latency_ms > 0
+          ? m.avg_inference_latency_ms.toFixed(0) + ' ms'
+          : '—';
+        document.getElementById('metric-memory').textContent = m.memory_mb + ' MB';
+        document.getElementById('metric-models').textContent = m.models_available + ' / 8';
+      } catch (e) { /* silent */ }
+    }
+    refreshDashboard();
+    setInterval(refreshDashboard, 10000);
+
   </script>
 </body>
 </html>

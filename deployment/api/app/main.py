@@ -60,6 +60,9 @@ logging.basicConfig(level=logging.DEBUG)
 # Uvicorn listens on a socket, receives the connection, does a bit
 # processing and hands the request over to FastAPI, according to
 # the ASGI interface.
+# Record startup time so we can report uptime in /dashboard-metrics
+APP_START_TIME = time.time()
+
 app = FastAPI(
     title="CXR Inference API",
     version="1.0.0",
@@ -589,6 +592,77 @@ async def predict(file: UploadFile = File(...), model: str = Query(default="mobi
 #######################################
 # 9. List available models endpoint.  #
 #######################################
+@app.get("/dashboard-metrics")
+def dashboard_metrics():
+    """
+    Lightweight JSON endpoint feeding the live dashboard widget in the UI.
+
+    Returns a small set of operationally meaningful numbers:
+      - uptime_seconds: how long this process has been running
+      - models_available: count of model checkpoints registered in config
+      - total_predictions: cumulative count across all model types
+      - avg_inference_latency_ms: average wall-clock inference time
+      - memory_mb: resident set size of this process in megabytes
+
+    This is intentionally a small custom endpoint rather than parsing
+    the full Prometheus /metrics output client-side.
+    """
+    # Uptime
+    uptime = time.time() - APP_START_TIME
+
+    # Models available (read fresh so a config change is reflected without restart)
+    try:
+        cfg_path = Path("/app/config/models_config.json")
+        cfg = json.loads(cfg_path.read_text())
+        models_available = len(cfg.get("available_models", {}))
+    except Exception:
+        models_available = 0
+
+    # Total predictions: sum the Prometheus Counter samples across labels
+    total_predictions = 0
+    try:
+        for sample in PREDICTIONS_TOTAL.collect()[0].samples:
+            if sample.name.endswith("_total"):
+                total_predictions += int(sample.value)
+    except Exception:
+        pass
+
+    # Average inference latency: sum / count from the Histogram
+    avg_latency_ms = 0.0
+    try:
+        total_sum = 0.0
+        total_count = 0
+        for sample in INFERENCE_DURATION_SECONDS.collect()[0].samples:
+            if sample.name.endswith("_sum"):
+                total_sum += sample.value
+            elif sample.name.endswith("_count"):
+                total_count += sample.value
+        if total_count > 0:
+            avg_latency_ms = (total_sum / total_count) * 1000.0
+    except Exception:
+        pass
+
+    # Resident memory in MB from /proc/self/status (Linux only; container is Linux)
+    memory_mb = 0
+    try:
+        with open("/proc/self/status") as fh:
+            for line in fh:
+                if line.startswith("VmRSS:"):
+                    # Line looks like: "VmRSS:    389664 kB"
+                    memory_mb = int(line.split()[1]) // 1024
+                    break
+    except Exception:
+        pass
+
+    return {
+        "uptime_seconds": int(uptime),
+        "models_available": models_available,
+        "total_predictions": total_predictions,
+        "avg_inference_latency_ms": round(avg_latency_ms, 1),
+        "memory_mb": memory_mb,
+    }
+
+
 @app.get("/models")
 def list_models():
     """
