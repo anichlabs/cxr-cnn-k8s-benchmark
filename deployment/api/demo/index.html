@@ -756,8 +756,22 @@
     @media (max-width: 640px) {
       .arch-layout { flex-direction: column; gap: 16px; }
     }
+    .arch-rail-title {
+      font-family: 'Bricolage Grotesque', 'Inter', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #000;
+      margin: 0 0 6px;
+    }
+    .arch-rail-sub {
+      color: #696a6d;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      margin: 0 0 16px;
+    }
     .arch-nav {
-      flex: 0 0 180px;
+      flex: 0 0 220px;
       display: flex;
       flex-direction: column;
       gap: 4px;
@@ -858,6 +872,11 @@
       line-height: 1.55;
       color: #2a2a2d;
       margin-top: 12px;
+    }
+    .footer-build {
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      font-size: 0.72rem;
+      color: #909192;
     }
   </style>
 </head>
@@ -1085,11 +1104,10 @@
 
     </div>
     <section data-tab-content="architecture" class="tab-pane arch-pane">
-      <h2 class="section-title">Architecture</h2>
-      <p class="section-sub">How the demo is built, deployed, and operated.</p>
-
       <div class="arch-layout">
         <aside class="arch-nav" aria-label="Architecture sub-sections">
+          <h2 class="arch-rail-title">Architecture</h2>
+          <p class="arch-rail-sub">How the demo is built, deployed, and operated.</p>
           <a href="#pipeline" data-subnav="pipeline" class="arch-nav-link active">Pipeline</a>
           <a href="#stack" data-subnav="stack" class="arch-nav-link">Stack</a>
           <a href="#repo" data-subnav="repo" class="arch-nav-link">Repository</a>
@@ -1116,7 +1134,12 @@
                   .link { stroke: #003399; stroke-width: 1.5; fill: none; }
                   .link-dashed { stroke: #696a6d; stroke-width: 1.5; fill: none; stroke-dasharray: 4 4; }
                   .vps-box { fill: #f7f7f8; stroke: #c8c9cb; stroke-dasharray: 4 3; }
-                </style>
+                  .footer-build {
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      font-size: 0.72rem;
+      color: #909192;
+    }
+  </style>
 
                 <text x="20" y="24" class="lbl lbl-strong">Request pipeline</text>
 
@@ -1317,15 +1340,18 @@
           </ul>
         </div>
         <div class="footer-col">
-          <h3>Contact</h3>
+          <h3>Company</h3>
           <ul>
-            <li><a href="mailto:contact@anichlabs.com">contact@anichlabs.com</a></li>
+            <li><a href="https://anichlabs.com" target="_blank" rel="noopener">Home</a></li>
+            <li><a href="https://anichlabs.com/about" target="_blank" rel="noopener">About</a></li>
+            <li><a href="https://anichlabs.com/contact" target="_blank" rel="noopener">Contact</a></li>
             <li><a href="https://calendly.com/chris-anichlabs/30min" target="_blank" rel="noopener">Book a call</a></li>
           </ul>
         </div>
       </div>
       <div class="footer-bottom">
         <p>© 2026 AnichLabs OÜ. Research demonstration, not a medical device.</p>
+        <p class="footer-build" id="footer-build"></p>
         <p>Registered in Estonia, EU</p>
       </div>
     </footer>
@@ -1514,6 +1540,12 @@
           : '—';
         document.getElementById('metric-memory').textContent = m.memory_mb + ' MB';
         document.getElementById('metric-models').textContent = m.models_available + ' / 8';
+        // Build hash + time in the footer (set once; it never changes mid-session)
+        const fb = document.getElementById('footer-build');
+        if (fb && m.git_commit && m.git_commit !== 'unknown') {
+          const when = (m.build_time && m.build_time !== 'unknown') ? ' · deployed ' + m.build_time : '';
+          fb.textContent = 'Build ' + m.git_commit + when;
+        }
       } catch (e) { /* silent */ }
     }
     refreshDashboard();

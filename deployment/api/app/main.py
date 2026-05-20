@@ -409,6 +409,60 @@ def load_config():
 ###########################################################
 # 6. Health endpoint                                      #
 ###########################################################
+@app.on_event("startup")
+def warm_up_inference():
+    """
+    Run a single inference at boot so that:
+      1. The /dashboard-metrics latency tile is never empty after a
+         restart (the Prometheus histogram has at least one sample).
+      2. The first real user does not pay the cold-start cost (model
+         load + lazy CUDA/CPU init). That cost is paid here instead.
+
+    The warm-up uses a bundled sample image and the default model. It
+    deliberately reuses the same inference code path as /predict so the
+    recorded latency is representative, not synthetic. Any failure here
+    is logged and swallowed: a warm-up problem must never stop the API
+    from starting.
+    """
+    try:
+        import glob
+        from PIL import Image as _Image
+
+        # Pick any bundled sample; fall back gracefully if none present.
+        sample_candidates = sorted(glob.glob("/app/demo/samples/fulls/*.jpg"))
+        if not sample_candidates:
+            logging.info("warm-up skipped: no bundled sample images found")
+            return
+
+        device_local = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        default_model = "efficientnet_b0_cxr"
+
+        loaded_model, _meta = load_model_from_config(default_model, device_local)
+
+        cfg_local = json.loads(Path("/app/config/preprocessing_config.json").read_text())
+        mean = cfg_local["mean"]
+        std = cfg_local["std"]
+        img_size_local = int(cfg_local["img_size"])
+        _, tfm = build_shared_transforms(
+            img_size=img_size_local,
+            mean=mean,
+            std=std,
+            transform_mode=cfg_local.get("transform_mode", "center-crop"),
+        )
+
+        img = _Image.open(sample_candidates[0]).convert("RGB")
+        x = tfm(img).unsqueeze(0).to(device_local)
+        model_type = os.getenv("MODEL_TYPE", "cpu")
+
+        with INFERENCE_DURATION_SECONDS.labels(model_type=model_type).time():
+            with torch.no_grad():
+                loaded_model(x)
+
+        logging.info("warm-up inference completed using %s", default_model)
+    except Exception as e:
+        logging.warning("warm-up inference failed (non-fatal): %s", e)
+
+
 @app.get("/health")
 def health():
     """
@@ -660,6 +714,8 @@ def dashboard_metrics():
         "total_predictions": total_predictions,
         "avg_inference_latency_ms": round(avg_latency_ms, 1),
         "memory_mb": memory_mb,
+        "git_commit": os.environ.get("CXR_GIT_COMMIT", "unknown"),
+        "build_time": os.environ.get("CXR_BUILD_TIME", "unknown"),
     }
 
 

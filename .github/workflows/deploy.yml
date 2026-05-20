@@ -30,6 +30,9 @@ jobs:
               'set -e
                cd ~/apps/cxr-cnn-k8s-benchmark
                git pull --ff-only
+               export GIT_COMMIT=$(git rev-parse --short HEAD)
+               export BUILD_TIME=$(date -u +%Y-%m-%dT%H:%MZ)
+               echo "Building commit $GIT_COMMIT at $BUILD_TIME"
                podman compose -f podman-compose.yml -f deployment/compose.prod.yml build
                podman compose -f podman-compose.yml -f deployment/compose.prod.yml up -d
                sleep 70

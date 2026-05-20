@@ -22,6 +22,14 @@
 # python:3.10-slim keeps the image small, secure, and fast to build.
 FROM python:3.10-slim AS base
 
+# Build metadata: the git commit this image was built from, and when.
+# Passed in by CI (and by local builds) as build args, surfaced at runtime
+# via the /dashboard-metrics endpoint. Defaults make local builds harmless.
+ARG GIT_COMMIT=unknown
+ARG BUILD_TIME=unknown
+ENV CXR_GIT_COMMIT=${GIT_COMMIT}
+ENV CXR_BUILD_TIME=${BUILD_TIME}
+
 #########################
 # 2. Install OS deps    #
 #########################
