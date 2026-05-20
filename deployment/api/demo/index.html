@@ -752,6 +752,7 @@
       display: grid;
       grid-template-columns: 180px 1fr;
       gap: 32px;
+      align-items: start;
     }
     @media (max-width: 720px) {
       .arch-layout { grid-template-columns: 1fr; gap: 16px; }
@@ -1562,7 +1563,6 @@
 
     // Smooth-scroll for top-nav tabs AND in-page anchor links (CTAs, sub-nav)
     function smoothScrollToId(id) {
-      // Try section-level target first, then any element with that id, then sub-nav target
       let target = document.querySelector('[data-tab-content="' + id + '"]');
       if (!target) target = document.getElementById(id);
       if (!target) target = document.querySelector('[data-subsection="' + id + '"]');
@@ -1570,6 +1570,10 @@
       const headerOffset = document.querySelector('.site-header').offsetHeight + 12;
       const top = target.getBoundingClientRect().top + window.scrollY - headerOffset;
       window.scrollTo({ top, behavior: 'smooth' });
+      // Force a sub-nav recompute after the smooth scroll settles
+      setTimeout(() => {
+        window.dispatchEvent(new Event('scroll'));
+      }, 600);
       return true;
     }
 
