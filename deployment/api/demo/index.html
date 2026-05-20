@@ -1060,9 +1060,9 @@
         <nav class="site-tabs" role="tablist" aria-label="Sections">
           <a class="site-tab" data-tab="overview" href="#overview" role="tab">Overview</a>
           <a class="site-tab" data-tab="demo" href="#demo" role="tab">Demo</a>
+          <a class="site-tab" data-tab="architecture" href="#architecture" role="tab">Architecture</a>
           <a class="site-tab" data-tab="results" href="#results" role="tab">Benchmarks</a>
           <a class="site-tab" data-tab="deployment" href="#deployment" role="tab">Metrics</a>
-          <a class="site-tab" data-tab="architecture" href="#architecture" role="tab">Architecture</a>
         </nav>
       </div>
     </header>
@@ -1273,41 +1273,6 @@
     </div>
 
     </div>
-    <div data-tab-content="results">
-    <section class="benchmark-section">
-      <h2 class="benchmark-title">Benchmark results</h2>
-      <p class="benchmark-sub">Test-set accuracy of all eight trained models. From the production evaluation pipeline.</p>
-      <div class="benchmark-list" id="benchmark-list">
-        <p class="benchmark-loading">Loading…</p>
-      </div>
-    </section>
-
-    </div>
-    <div data-tab-content="deployment">
-    <section class="dashboard-section">
-      <h2 class="dashboard-title">Live metrics</h2>
-      <p class="dashboard-sub">Live from this server. Refreshes every 5 seconds.</p>
-      <div class="dashboard-grid">
-        <div class="metric-tile">
-          <div class="metric-label">Uptime</div>
-          <div class="metric-value" id="metric-uptime">—</div>
-        </div>
-        <div class="metric-tile">
-          <div class="metric-label">Avg inference</div>
-          <div class="metric-value" id="metric-latency">—</div>
-        </div>
-        <div class="metric-tile">
-          <div class="metric-label">Memory in use</div>
-          <div class="metric-value" id="metric-memory">—</div>
-        </div>
-        <div class="metric-tile">
-          <div class="metric-label">Models loaded</div>
-          <div class="metric-value" id="metric-models">—</div>
-        </div>
-      </div>
-    </section>
-  </div>
-
     <section data-tab-content="architecture" class="tab-pane arch-pane">
       <div class="arch-layout">
         <aside class="arch-nav" aria-label="Architecture sub-sections">
@@ -1473,6 +1438,41 @@
         </div>
       </div>
     </section>
+
+    <div data-tab-content="results">
+    <section class="benchmark-section">
+      <h2 class="benchmark-title">Benchmark results</h2>
+      <p class="benchmark-sub">Test-set accuracy of all eight trained models. From the production evaluation pipeline.</p>
+      <div class="benchmark-list" id="benchmark-list">
+        <p class="benchmark-loading">Loading…</p>
+      </div>
+    </section>
+
+    </div>
+    <div data-tab-content="deployment">
+    <section class="dashboard-section">
+      <h2 class="dashboard-title">Live metrics</h2>
+      <p class="dashboard-sub">Live from this server. Refreshes every 5 seconds.</p>
+      <div class="dashboard-grid">
+        <div class="metric-tile">
+          <div class="metric-label">Uptime</div>
+          <div class="metric-value" id="metric-uptime">—</div>
+        </div>
+        <div class="metric-tile">
+          <div class="metric-label">Avg inference</div>
+          <div class="metric-value" id="metric-latency">—</div>
+        </div>
+        <div class="metric-tile">
+          <div class="metric-label">Memory in use</div>
+          <div class="metric-value" id="metric-memory">—</div>
+        </div>
+        <div class="metric-tile">
+          <div class="metric-label">Models loaded</div>
+          <div class="metric-value" id="metric-models">—</div>
+        </div>
+      </div>
+    </section>
+  </div>
 
     <footer class="site-footer">
       <div class="footer-grid">
@@ -1760,7 +1760,7 @@
 
   
     // ----- One-page scroll navigation -----
-    const SECTIONS = ['overview', 'demo', 'results', 'deployment', 'architecture'];
+    const SECTIONS = ['overview', 'demo', 'architecture', 'results', 'deployment'];
 
     // Smooth-scroll for top-nav tabs AND in-page anchor links (CTAs, sub-nav)
     function smoothScrollToId(id) {
