@@ -440,13 +440,16 @@ def warm_up_inference():
         loaded_model, _meta = load_model_from_config(default_model, device_local)
 
         cfg_local = json.loads(Path("/app/config/preprocessing_config.json").read_text())
-        mean = cfg_local["mean"]
-        std = cfg_local["std"]
+        # efficientnet_b0_cxr is a CXR-domain model, so use the CXR
+        # normalisation statistics (the config has no bare 'mean'/'std';
+        # it has imagenet_* and cxr_* variants).
+        mean_local = cfg_local["cxr_mean"]
+        std_local = cfg_local["cxr_std"]
         img_size_local = int(cfg_local["img_size"])
         _, tfm = build_shared_transforms(
             img_size=img_size_local,
-            mean=mean,
-            std=std,
+            mean=mean_local,
+            std=std_local,
             transform_mode=cfg_local.get("transform_mode", "center-crop"),
         )
 
