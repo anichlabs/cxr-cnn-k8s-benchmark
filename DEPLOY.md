@@ -21,7 +21,7 @@ If you only need to redeploy after pushing code changes, jump to
 |---|---|
 | Public URL | `https://cxr.anichlabs.com` |
 | Server provider | Hetzner Cloud |
-| Server type | CX33 (4 vCPU shared Intel, 8 GB RAM, 80 GB SSD) |
+| Server type | CX23 (2 vCPU shared Intel, 4 GB RAM, 40 GB SSD) |
 | Region | Nuremberg (NBG1) |
 | OS | Ubuntu 24.04 LTS |
 | Cost | ~6.49 EUR / month |
@@ -49,7 +49,7 @@ subdomains without rearchitecting anything.
 Internet
    |
    v
-[Hetzner CX33 VPS, public IPv4: 178.105.172.65]
+[Hetzner CX23 VPS, public IPv4: 178.105.172.65]
    |
    +-- UFW: allow 22, 80, 443
    +-- Caddy 2.11 (host service, runs as caddy user)
@@ -109,7 +109,7 @@ documentation are tracked) but not as binary blobs.
 
 | Layer | Choice | Why |
 |---|---|---|
-| Server | Hetzner CX33 | Cheapest x86 VPS that comfortably hosts PyTorch CPU inference plus a handful of small apps. EU jurisdiction. |
+| Server | Hetzner CX23 | Small x86 VPS (2 vCPU, 4 GB RAM) that comfortably hosts PyTorch CPU inference plus a handful of small apps. EU jurisdiction. |
 | OS | Ubuntu 24.04 LTS | Stable, well-documented, default Podman 4.9 in repos. |
 | Container runtime | Podman, rootless | No daemon, smaller blast radius if the user is compromised. `podman kube generate` produces real K8s YAML, easing a future migration. |
 | Orchestrator | `podman compose` with Compose v2 plugin | Step on the path from local dev to potential K8s. Keeps the YAML portable. |
@@ -125,7 +125,7 @@ not "I shipped the latest hot framework".
 
 ## 5. First-time server setup (from clean Ubuntu)
 
-Run these once on a fresh Hetzner CX33 with Ubuntu 24.04 selected
+Run these once on a fresh Hetzner CX23 with Ubuntu 24.04 selected
 and the SSH public key registered in the Hetzner project's Security
 section before server creation.
 
@@ -487,7 +487,7 @@ Logs, container images, build caches. All reproducible.
 
 If the server is unrecoverable:
 
-1. Create a new CX33 in Hetzner with the same SSH key.
+1. Create a new CX23 in Hetzner with the same SSH key.
 2. Update DNS A and AAAA records to the new IP.
 3. Run steps 5.1 through 5.12 above. End-to-end this takes about an
    hour, mostly waiting for the image rebuild.
@@ -590,7 +590,7 @@ sudo chown caddy:caddy /var/log/caddy/cxr.access.log
 
 - Single VPS, no high availability. Acceptable for a demo. If the
   server is unavailable, the demo is unavailable.
-- 8 GB RAM is comfortable for the CXR API alone; with several more
+- 4 GB RAM is sufficient for the CXR API alone; with several more
   portfolio apps on the same box, a resize to CX43 may become
   necessary. Hetzner resize is online and takes ~2 minutes.
 - No application-layer rate limiting yet. Add a `rate_limit`

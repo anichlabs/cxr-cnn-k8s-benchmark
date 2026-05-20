@@ -21,7 +21,7 @@
 
     body {
       font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
-      background: linear-gradient(138deg, #ffffff 0%, #ffffff 18%, #dbe4ff 100%);
+      background: linear-gradient(138deg, #eef2ff 0%, #ffffff 30%, #cdd9ff 100%);
       background-attachment: fixed;
       color: #000000;
       line-height: 1.6;
@@ -877,8 +877,16 @@
     }
     .footer-build {
       font-family: ui-monospace, "SF Mono", Menlo, monospace;
-      font-size: 0.72rem;
-      color: #909192;
+      font-size: 0.8rem;
+      color: #696a6d;
+    }
+    /* ===== Mobile nav fit: tighten spacing so all 5 tabs fit (<=640px) ===== */
+    @media (max-width: 640px) {
+      .site-tabs { gap: 0; }
+      .site-tab {
+        padding: 10px 9px;
+        font-size: 0.86rem;
+      }
     }
     /* ===== Mobile accordion for Architecture (<=640px only) ===== */
     @media (max-width: 640px) {
@@ -1344,7 +1352,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr><td>Server</td><td>Hetzner CX33</td><td>Cheapest x86 VPS that comfortably hosts PyTorch CPU inference. EU jurisdiction.</td></tr>
+                  <tr><td>Server</td><td>Hetzner CX23</td><td>Small x86 VPS (2 vCPU, 4 GB RAM) that comfortably hosts PyTorch CPU inference. EU jurisdiction.</td></tr>
                   <tr><td>OS</td><td>Ubuntu 24.04 LTS</td><td>Stable, well-documented, Podman 4.9 in repos.</td></tr>
                   <tr><td>Runtime</td><td>Podman rootless</td><td>No daemon, smaller blast radius. K8s migration is one command away.</td></tr>
                   <tr><td>Compose</td><td>podman compose (Compose v2 plugin)</td><td>Same YAML works locally and on the server.</td></tr>
