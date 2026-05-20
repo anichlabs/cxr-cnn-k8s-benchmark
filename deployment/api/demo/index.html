@@ -564,7 +564,10 @@
       gap: 4px;
       overflow-x: auto;
       scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
     }
+    .site-tabs::-webkit-scrollbar { display: none; }
+    .site-tab { flex: 0 0 auto; white-space: nowrap; }
     .site-tabs::-webkit-scrollbar { display: none; }
     .site-tab {
       flex: none;
@@ -786,13 +789,12 @@
       .arch-nav {
         flex: 1 1 auto;
         position: static;
-        flex-direction: row;
-        overflow-x: auto;
+        flex-direction: column;
+        overflow-x: visible;
         border-left: none;
-        border-bottom: 1px solid #e2e2e4;
-        padding: 0 0 8px;
-        gap: 4px;
-        scrollbar-width: none;
+        border-bottom: none;
+        padding: 0;
+        gap: 0;
         max-height: none;
       }
       .arch-nav::-webkit-scrollbar { display: none; }
@@ -883,6 +885,8 @@
       /* Hide the sticky rail's sub-nav links on mobile; the h3 headers
          become the navigation instead. Keep the title + subtitle. */
       .arch-nav .arch-nav-link { display: none; }
+      .arch-rail-title { margin: 0 0 4px; font-size: 1.6rem; }
+      .arch-rail-sub { margin: 0 0 16px; font-size: 0.9rem; }
       .arch-nav {
         border: none;
         padding: 0;
@@ -938,6 +942,23 @@
         margin-right: 18px;
       }
       .arch-block.open > p:last-child { padding-bottom: 16px; }
+      /* Keep wide content (table, code tree, diagram) inside the card and
+         let it scroll sideways rather than overflow the viewport. */
+      .arch-block.open > .arch-table-wrap,
+      .arch-block.open > .arch-diagram {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        max-width: calc(100vw - 72px);
+      }
+      .arch-block.open > .arch-tree {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        max-width: calc(100vw - 72px);
+        white-space: pre;
+        font-size: 0.7rem;
+      }
+      .arch-block.open .arch-table { min-width: 480px; }
+      .arch-block.open .arch-diagram svg { min-width: 560px; }
     }
   </style>
 </head>
@@ -960,14 +981,14 @@
 
     <div class="persistent-banner">
       <div class="about-demo">
-        <strong>About this demo.</strong> A portfolio MLOps pipeline: containerised FastAPI service serving eight PyTorch checkpoints, behind Caddy reverse proxy with auto-HTTPS, deployed on a single Hetzner VPS with rootless Podman. The focus is the engineering and deployment, not the model.
+        <strong>About this demo.</strong> A production MLOps case study: a containerised FastAPI service serving eight PyTorch checkpoints, behind a Caddy reverse proxy with auto-HTTPS, deployed on a single Hetzner VPS with rootless Podman. The focus is the engineering and deployment, not the model.
       </div>
       <div class="disclaimer"><strong>Research demo only.</strong> Not a medical device. Not for clinical use, diagnosis, or treatment decisions. Trained on public research datasets (CheXpert, TBX11K); accuracy may drop sharply on X-rays from other hospitals or equipment. Do not use predictions here for any medical decision.</div>
     </div>
 
     <section data-tab-content="overview" class="tab-pane overview-pane">
       <h1 class="hero-title">Chest X-ray classification, deployed.</h1>
-      <p class="hero-sub">A portfolio MLOps case study: eight PyTorch models trained on public research data, served behind a containerised FastAPI service, deployed on a single Hetzner VPS with auto-HTTPS, CI/CD, and live observability.</p>
+      <p class="hero-sub">A production MLOps case study: eight PyTorch models trained on public research data, served behind a containerised FastAPI service, deployed on a single Hetzner VPS with auto-HTTPS, CI/CD, and live observability.</p>
 
       <div class="stat-grid">
         <div class="stat-card">
@@ -991,7 +1012,7 @@
       <div class="overview-text">
         <p>This page is one project under <a href="https://anichlabs.com" target="_blank" rel="noopener">AnichLabs OÜ</a>, an Estonian software and AI company. The demo you can interact with here is the production engineering layer built around a chest X-ray classifier trained on public research datasets.</p>
         <p>Four CNN architectures (MobileNetV2, EfficientNet-B0, ResNet-50, and a custom Victorio network) are each trained in two normalisation domains (CheXpert and ImageNet), giving eight checkpoints that ship inside one FastAPI container. The Demo section lets you upload an X-ray or pick a sample and see all relevant metadata, including model confidence and per-class probabilities. The Results section shows test-set accuracy across all eight models, and the Deployment section surfaces live operational metrics straight from the running container.</p>
-        <p>Everything here, from the container to the auto-renewing TLS certificate to the dashboard you are looking at, is hand-built, deliberately boring, and meant to demonstrate what a senior MLOps deployment looks like at portfolio scale.</p>
+        <p>Everything here runs on a single self-managed server: the container, the reverse proxy, the auto-renewing TLS certificate, and the live dashboard. The aim was a small, reliable, fully owned production system rather than a managed-platform demo.</p>
       </div>
 
       <div class="cta-row">
@@ -1356,7 +1377,7 @@
           <div data-subsection="rationale" class="arch-block">
             <h3 class="arch-h3">Rationale</h3>
             <p>The design optimises for three things in order: <strong>reliability</strong>, <strong>cost</strong>, and <strong>portfolio clarity</strong>.</p>
-            <p>Reliability comes from boring choices. systemd, Caddy, Podman, UFW, fail2ban: all of them are documented to death and behave predictably when something goes wrong. Nothing in the stack requires me to read a Discord channel to debug.</p>
+            <p>Reliability comes from boring choices. systemd, Caddy, Podman, UFW, fail2ban: all of them are documented to death and behave predictably when something goes wrong. None of it depends on chasing answers in a Discord channel to debug.</p>
             <p>Cost is held down by running a single, small VPS with the API container bound to localhost. The reverse proxy is the only thing the public internet can reach, and it handles TLS, HTTP/3, gzip, and the access log in one binary.</p>
             <p>Portfolio clarity drives the decision not to deploy Grafana, Prometheus servers, or a full K8s cluster for one demo. They would be overkill, expensive, and would obscure the engineering behind layers of infrastructure no one would inspect. Instead, the app instruments itself, exposes its metrics, and the page you are reading renders them client-side. Same signal at one-tenth the operational weight.</p>
             <p>The same pattern repeats for every other portfolio app on this server. Add a subdomain in DNS, add a one-line block in the Caddyfile, deploy another rootless container behind it. Multi-tenancy without Kubernetes.</p>
@@ -1373,7 +1394,7 @@
           </a>
           <p class="footer-desc">
             Built by Dr Christopher Anich, medical doctor and AI engineer. This is
-            a portfolio MLOps case study by AnichLabs OÜ, an Estonian software
+            a production MLOps case study by AnichLabs OÜ, an Estonian software
             and AI company building production systems where privacy, compliance,
             and reliability matter.
           </p>
@@ -1759,17 +1780,15 @@
       blocks.forEach(block => {
         const header = block.querySelector('.arch-h3');
         if (!header) return;
-        header.addEventListener('click', () => {
+        header.addEventListener('click', (e) => {
           // Only behave as an accordion on mobile widths.
           if (window.innerWidth > 640) return;
-          const isOpen = block.classList.contains('open');
+          e.preventDefault();
+          e.stopPropagation();
+          const wasOpen = block.classList.contains('open');
+          // Close all, then open the tapped one if it was not already open.
           blocks.forEach(b => b.classList.remove('open'));
-          if (!isOpen) {
-            block.classList.add('open');
-            // Bring the freshly opened header into view below the header bar.
-            const top = block.getBoundingClientRect().top + window.scrollY - 80;
-            window.scrollTo({ top, behavior: 'smooth' });
-          }
+          if (!wasOpen) block.classList.add('open');
         });
       });
     })();
