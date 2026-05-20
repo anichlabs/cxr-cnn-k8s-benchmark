@@ -1324,7 +1324,7 @@
 
           <div data-subsection="stack" class="arch-block">
             <h3 class="arch-h3">Stack</h3>
-            <p>Each layer is a deliberate, boring, well-documented choice.</p>
+            <p>Each layer is a deliberate, well-documented choice.</p>
             <div class="arch-table-wrap">
               <table class="arch-table">
                 <thead>
@@ -1377,7 +1377,7 @@
           <div data-subsection="rationale" class="arch-block">
             <h3 class="arch-h3">Rationale</h3>
             <p>The design optimises for three things in order: <strong>reliability</strong>, <strong>cost</strong>, and <strong>portfolio clarity</strong>.</p>
-            <p>Reliability comes from boring choices. systemd, Caddy, Podman, UFW, fail2ban: all of them are documented to death and behave predictably when something goes wrong. None of it depends on chasing answers in a Discord channel to debug.</p>
+            <p>Reliability comes from standard, well-understood tools. systemd, Caddy, Podman, UFW, fail2ban: all of them are thoroughly documented and behave predictably when something goes wrong. None of it depends on community chat channels for support.</p>
             <p>Cost is held down by running a single, small VPS with the API container bound to localhost. The reverse proxy is the only thing the public internet can reach, and it handles TLS, HTTP/3, gzip, and the access log in one binary.</p>
             <p>Portfolio clarity drives the decision not to deploy Grafana, Prometheus servers, or a full K8s cluster for one demo. They would be overkill, expensive, and would obscure the engineering behind layers of infrastructure no one would inspect. Instead, the app instruments itself, exposes its metrics, and the page you are reading renders them client-side. Same signal at one-tenth the operational weight.</p>
             <p>The same pattern repeats for every other portfolio app on this server. Add a subdomain in DNS, add a one-line block in the Caddyfile, deploy another rootless container behind it. Multi-tenancy without Kubernetes.</p>
