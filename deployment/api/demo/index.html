@@ -885,8 +885,17 @@
       /* Hide the sticky rail's sub-nav links on mobile; the h3 headers
          become the navigation instead. Keep the title + subtitle. */
       .arch-nav .arch-nav-link { display: none; }
-      .arch-rail-title { margin: 0 0 4px; font-size: 1.6rem; }
-      .arch-rail-sub { margin: 0 0 16px; font-size: 0.9rem; }
+      .arch-rail-title {
+        margin: 0;
+        font-size: 1.3rem;
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background: #f4f6ff;
+        padding: 10px 0 8px;
+        border-bottom: 1px solid #e2e2e4;
+      }
+      .arch-rail-sub { margin: 8px 0 16px; font-size: 0.9rem; }
       .arch-nav {
         border: none;
         padding: 0;
@@ -1788,7 +1797,19 @@
           const wasOpen = block.classList.contains('open');
           // Close all, then open the tapped one if it was not already open.
           blocks.forEach(b => b.classList.remove('open'));
-          if (!wasOpen) block.classList.add('open');
+          if (!wasOpen) {
+            block.classList.add('open');
+            // After the layout reflows from opening/closing, scroll the
+            // tapped header to a fixed spot just below the sticky main nav,
+            // so the opened content always appears in the same place rather
+            // than jumping unpredictably. requestAnimationFrame waits for the
+            // reflow so the measured position is correct.
+            requestAnimationFrame(() => {
+              const headerH = document.querySelector('.site-header').offsetHeight + 8;
+              const top = block.getBoundingClientRect().top + window.scrollY - headerH;
+              window.scrollTo({ top, behavior: 'smooth' });
+            });
+          }
         });
       });
     })();
