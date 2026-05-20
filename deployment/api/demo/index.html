@@ -6,8 +6,77 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2212%22 fill=%22%23000000%22/%3E%3Ctext x=%2232%22 y=%2244%22 font-family=%22Bricolage Grotesque,Inter,sans-serif%22 font-size=%2238%22 font-weight=%22700%22 text-anchor=%22middle%22 fill=%22white%22%3EA%3C/text%3E%3C/svg%3E">
-  <title>CXR Classifier Demo · AnichLabs OÜ</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2212%22 fill=%22%23003399%22/%3E%3Cg stroke=%22white%22 stroke-width=%223%22 fill=%22none%22 stroke-linecap=%22round%22%3E%3Cline x1=%2232%22 y1=%2214%22 x2=%2232%22 y2=%2250%22/%3E%3Cpath d=%22M32 20 C24 20 18 24 16 30%22/%3E%3Cpath d=%22M32 20 C40 20 46 24 48 30%22/%3E%3Cpath d=%22M32 28 C23 28 17 32 15 39%22/%3E%3Cpath d=%22M32 28 C41 28 47 32 49 39%22/%3E%3Cpath d=%22M32 36 C24 36 18 40 17 46%22/%3E%3Cpath d=%22M32 36 C40 36 46 40 47 46%22/%3E%3C/g%3E%3C/svg%3E">
+  <title>Chest X-ray Classification | AnichLabs OÜ</title>
+  <meta name="description" content="A production MLOps case study by AnichLabs OÜ: eight PyTorch models classifying chest X-rays (pneumonia, TB, normal), served from a containerised FastAPI service on a single VPS with live metrics.">
+  <link rel="canonical" href="https://cxr.anichlabs.com/">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph (WhatsApp, Facebook, LinkedIn) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="AnichLabs OÜ">
+  <meta property="og:title" content="Chest X-ray Classification | AnichLabs OÜ">
+  <meta property="og:description" content="A production MLOps case study: eight PyTorch models classifying chest X-rays, served from a containerised FastAPI service on a single VPS with live metrics. Not a medical device.">
+  <meta property="og:url" content="https://cxr.anichlabs.com/">
+  <meta property="og:image" content="https://cxr.anichlabs.com/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="AnichLabs Chest X-ray Classification - production MLOps case study">
+
+  <!-- Twitter / X card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Chest X-ray Classification | AnichLabs OÜ">
+  <meta name="twitter:description" content="A production MLOps case study: eight PyTorch models classifying chest X-rays, served from a containerised FastAPI service on a single VPS with live metrics.">
+  <meta name="twitter:image" content="https://cxr.anichlabs.com/og-image.png">
+
+  <!-- Structured data for search engines and AI systems (AIO) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://anichlabs.com/#organization",
+        "name": "AnichLabs OÜ",
+        "url": "https://anichlabs.com",
+        "description": "Estonian software and AI company building production systems where privacy, compliance, and reliability matter.",
+        "foundingLocation": "Estonia",
+        "founder": {
+          "@type": "Person",
+          "@id": "https://anichlabs.com/#christopher-anich",
+          "name": "Christopher Anich",
+          "jobTitle": "Medical doctor and AI engineer",
+          "sameAs": [
+            "https://www.linkedin.com/in/dr-christopher-anich-598555232/",
+            "https://github.com/chrisanich"
+          ]
+        }
+      },
+      {
+        "@type": "WebApplication",
+        "@id": "https://cxr.anichlabs.com/#webapp",
+        "name": "Chest X-ray Classification Demo",
+        "url": "https://cxr.anichlabs.com/",
+        "applicationCategory": "HealthApplication",
+        "operatingSystem": "Web",
+        "isAccessibleForFree": true,
+        "creator": { "@id": "https://anichlabs.com/#organization" },
+        "author": { "@id": "https://anichlabs.com/#christopher-anich" },
+        "description": "A production MLOps case study: eight PyTorch models (MobileNetV2, EfficientNet-B0, ResNet-50, and a custom CNN) classifying chest X-rays into pneumonia, tuberculosis, or normal. Served from a containerised FastAPI service behind a Caddy reverse proxy on a single Hetzner VPS, with CI/CD and live operational metrics. A research demonstration, not a medical device.",
+        "featureList": [
+          "Eight trained PyTorch image-classification models",
+          "Three-class output: pneumonia, tuberculosis, normal",
+          "Containerised FastAPI inference service",
+          "Live operational metrics dashboard"
+        ],
+        "citation": [
+          { "@type": "Dataset", "name": "CheXpert", "url": "https://stanfordmlgroup.github.io/competitions/chexpert/" },
+          { "@type": "Dataset", "name": "TBX11K", "url": "https://mmcheng.net/tb/" }
+        ]
+      }
+    ]
+  }
+  </script>
   <style>
     * {
       margin: 0;
@@ -403,7 +472,7 @@
       outline-offset: 2px;
     }
     .brand-anich { color: #000000; font-weight: 700; }
-    .brand-labs { color: #003399; font-weight: 700; }
+    .brand-labs { color: #003399; font-weight: 400; }
     .brand-ou { color: #909192; font-weight: 400; font-size: 0.85em; margin-left: 2px; }
     .dashboard-section {
       margin-top: 40px;
@@ -547,7 +616,7 @@
     .header-inner {
       max-width: 1100px;
       margin: 0 auto;
-      padding: 14px 0 0 0;
+      padding: 8px 0 0 0;
       display: flex;
       flex-direction: column;
       gap: 8px;
