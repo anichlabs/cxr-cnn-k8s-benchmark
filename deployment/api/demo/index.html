@@ -762,9 +762,12 @@
       gap: 4px;
       position: sticky;
       top: 92px;
-      align-self: start;
+      align-self: flex-start;
+      max-height: calc(100vh - 110px);
+      overflow-y: auto;
       border-left: 1px solid #e2e2e4;
       padding-left: 12px;
+      z-index: 5;
     }
     @media (max-width: 720px) {
       .arch-nav {
@@ -897,12 +900,12 @@
         </div>
         <div class="stat-card">
           <div class="stat-value">1</div>
-          <div class="stat-label">VPS, 6.49 EUR/mo</div>
+          <div class="stat-label">VPS, low-cost</div>
         </div>
       </div>
 
       <div class="overview-text">
-        <p>This page is one project under <a href="https://anichlabs.com" target="_blank" rel="noopener">AnichLabs OÜ</a>, an Estonian software and AI company. The classifier itself comes from MSc research at CCT College Dublin and a paper submitted to IMVIP 2026; the demo you can interact with here is the production engineering layer built on top of that research.</p>
+        <p>This page is one project under <a href="https://anichlabs.com" target="_blank" rel="noopener">AnichLabs OÜ</a>, an Estonian software and AI company. The demo you can interact with here is the production engineering layer built around a chest X-ray classifier trained on public research datasets.</p>
         <p>Four CNN architectures (MobileNetV2, EfficientNet-B0, ResNet-50, and a custom Victorio network) are each trained in two normalisation domains (CheXpert and ImageNet), giving eight checkpoints that ship inside one FastAPI container. The Demo section lets you upload an X-ray or pick a sample and see all relevant metadata, including model confidence and per-class probabilities. The Results section shows test-set accuracy across all eight models, and the Deployment section surfaces live operational metrics straight from the running container.</p>
         <p>Everything here, from the container to the auto-renewing TLS certificate to the dashboard you are looking at, is hand-built, deliberately boring, and meant to demonstrate what a senior MLOps deployment looks like at portfolio scale.</p>
       </div>
@@ -1128,9 +1131,12 @@
       gap: 4px;
       position: sticky;
       top: 92px;
-      align-self: start;
+      align-self: flex-start;
+      max-height: calc(100vh - 110px);
+      overflow-y: auto;
       border-left: 1px solid #e2e2e4;
       padding-left: 12px;
+      z-index: 5;
     }
     @media (max-width: 720px) {
       .arch-nav {
@@ -1337,7 +1343,7 @@
             <h3 class="arch-h3">Rationale</h3>
             <p>The design optimises for three things in order: <strong>reliability</strong>, <strong>cost</strong>, and <strong>portfolio clarity</strong>.</p>
             <p>Reliability comes from boring choices. systemd, Caddy, Podman, UFW, fail2ban: all of them are documented to death and behave predictably when something goes wrong. Nothing in the stack requires me to read a Discord channel to debug.</p>
-            <p>Cost is held down by running a single, small VPS (4 vCPU, 8 GB, 80 GB SSD at €6.49 per month) with the API container bound to localhost. The reverse proxy is the only thing the public internet can reach, and it handles TLS, HTTP/3, gzip, and the access log in one binary.</p>
+            <p>Cost is held down by running a single, small VPS with the API container bound to localhost. The reverse proxy is the only thing the public internet can reach, and it handles TLS, HTTP/3, gzip, and the access log in one binary.</p>
             <p>Portfolio clarity drives the decision not to deploy Grafana, Prometheus servers, or a full K8s cluster for one demo. They would be overkill, expensive, and would obscure the engineering behind layers of infrastructure no one would inspect. Instead, the app instruments itself, exposes its metrics, and the page you are reading renders them client-side. Same signal at one-tenth the operational weight.</p>
             <p>The same pattern repeats for every other portfolio app on this server. Add a subdomain in DNS, add a one-line block in the Caddyfile, deploy another rootless container behind it. Multi-tenancy without Kubernetes.</p>
           </div>
@@ -1388,9 +1394,8 @@
           </a>
           <p class="footer-desc">
             Built by Christopher Anich. This is a portfolio MLOps case study by
-            AnichLabs OÜ, an Estonian software and AI company. The
-            underlying research is based on MSc work at CCT College Dublin and
-            an accompanying paper submitted to IMVIP 2026.
+            AnichLabs OÜ, an Estonian software and AI company building
+            production systems where privacy, compliance, and reliability matter.
           </p>
           <div class="footer-socials">
             <a href="https://www.linkedin.com/in/dr-christopher-anich-598555232/" target="_blank" rel="noopener" aria-label="LinkedIn">
