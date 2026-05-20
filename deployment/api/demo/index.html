@@ -878,6 +878,67 @@
       font-size: 0.72rem;
       color: #909192;
     }
+    /* ===== Mobile accordion for Architecture (<=640px only) ===== */
+    @media (max-width: 640px) {
+      /* Hide the sticky rail's sub-nav links on mobile; the h3 headers
+         become the navigation instead. Keep the title + subtitle. */
+      .arch-nav .arch-nav-link { display: none; }
+      .arch-nav {
+        border: none;
+        padding: 0;
+        margin-bottom: 8px;
+      }
+      /* Each block becomes an accordion card */
+      .arch-block {
+        margin-bottom: 12px;
+        border: 1px solid #e2e2e4;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #ffffff;
+        scroll-margin-top: 80px;
+      }
+      /* The h3 becomes a full-width tappable header with a chevron */
+      .arch-h3 {
+        margin: 0;
+        padding: 16px 18px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        user-select: none;
+        background: #ffffff;
+        transition: background 0.15s ease;
+      }
+      .arch-h3::after {
+        content: "";
+        width: 10px;
+        height: 10px;
+        border-right: 2px solid #696a6d;
+        border-bottom: 2px solid #696a6d;
+        transform: rotate(-45deg);
+        transition: transform 0.2s ease;
+        margin-left: 12px;
+        flex: 0 0 auto;
+      }
+      .arch-block.open .arch-h3 { background: #dbe4ff; }
+      .arch-block.open .arch-h3::after { transform: rotate(45deg); }
+      /* Collapsed: hide everything in the block except the h3 header */
+      .arch-block > *:not(.arch-h3) { display: none; }
+      .arch-block.open > * { display: block; }
+      .arch-block.open > .arch-diagram,
+      .arch-block.open > .arch-table-wrap { display: block; }
+      /* Pad the revealed content so it is not flush to the card edge */
+      .arch-block.open > p,
+      .arch-block.open > .arch-diagram,
+      .arch-block.open > .arch-table-wrap,
+      .arch-block.open > .arch-tree,
+      .arch-block.open > .arch-caption {
+        margin-left: 18px;
+        margin-right: 18px;
+      }
+      .arch-block.open > p:last-child { padding-bottom: 16px; }
+    }
   </style>
 </head>
 <body>
@@ -901,7 +962,7 @@
       <div class="about-demo">
         <strong>About this demo.</strong> A portfolio MLOps pipeline: containerised FastAPI service serving eight PyTorch checkpoints, behind Caddy reverse proxy with auto-HTTPS, deployed on a single Hetzner VPS with rootless Podman. The focus is the engineering and deployment, not the model.
       </div>
-      <div class="disclaimer"><strong>Research demo only.</strong> Not a medical device. Not for clinical use, diagnosis, or treatment decisions. Trained on public research datasets (CheXpert, TBX11K); accuracy may drop sharply on X-rays from other hospitals or equipment. Do not use predictions here for any medical decision. See <a href="https://anichlabs.com" target="_blank" rel="noopener">project notes</a> for details.</div>
+      <div class="disclaimer"><strong>Research demo only.</strong> Not a medical device. Not for clinical use, diagnosis, or treatment decisions. Trained on public research datasets (CheXpert, TBX11K); accuracy may drop sharply on X-rays from other hospitals or equipment. Do not use predictions here for any medical decision.</div>
     </div>
 
     <section data-tab-content="overview" class="tab-pane overview-pane">
@@ -1169,11 +1230,6 @@
                   .link { stroke: #003399; stroke-width: 1.5; fill: none; }
                   .link-dashed { stroke: #696a6d; stroke-width: 1.5; fill: none; stroke-dasharray: 4 4; }
                   .vps-box { fill: #f7f7f8; stroke: #c8c9cb; stroke-dasharray: 4 3; }
-                  .footer-build {
-      font-family: ui-monospace, "SF Mono", Menlo, monospace;
-      font-size: 0.72rem;
-      color: #909192;
-    }
   </style>
 
                 <text x="20" y="24" class="lbl lbl-strong">Request pipeline</text>
@@ -1685,6 +1741,37 @@
       }
       window.addEventListener('scroll', updateActive, { passive: true });
       updateActive();
+    })();
+
+  
+    // ----- Architecture mobile accordion -----
+    // The arch-h3 headers act as accordion toggles. Collapse styling lives
+    // in the <=640px media query, so on desktop these clicks are inert and
+    // every block stays open. One section open at a time on mobile.
+    (function setupArchAccordion() {
+      const blocks = Array.from(document.querySelectorAll('.arch-block'));
+      if (!blocks.length) return;
+
+      // Open the first block by default so mobile users see content, not
+      // four collapsed bars.
+      blocks[0].classList.add('open');
+
+      blocks.forEach(block => {
+        const header = block.querySelector('.arch-h3');
+        if (!header) return;
+        header.addEventListener('click', () => {
+          // Only behave as an accordion on mobile widths.
+          if (window.innerWidth > 640) return;
+          const isOpen = block.classList.contains('open');
+          blocks.forEach(b => b.classList.remove('open'));
+          if (!isOpen) {
+            block.classList.add('open');
+            // Bring the freshly opened header into view below the header bar.
+            const top = block.getBoundingClientRect().top + window.scrollY - 80;
+            window.scrollTo({ top, behavior: 'smooth' });
+          }
+        });
+      });
     })();
 
   </script>
