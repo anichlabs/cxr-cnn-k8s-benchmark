@@ -749,21 +749,20 @@
       margin: 0 0 24px;
     }
     .arch-layout {
-      display: grid;
-      grid-template-columns: 180px 1fr;
+      display: flex;
       gap: 32px;
-      align-items: start;
+      align-items: flex-start;
     }
     @media (max-width: 640px) {
-      .arch-layout { grid-template-columns: 1fr; gap: 16px; }
+      .arch-layout { flex-direction: column; gap: 16px; }
     }
     .arch-nav {
+      flex: 0 0 180px;
       display: flex;
       flex-direction: column;
       gap: 4px;
       position: sticky;
       top: 92px;
-      align-self: flex-start;
       max-height: calc(100vh - 110px);
       overflow-y: auto;
       border-left: 1px solid #e2e2e4;
@@ -772,6 +771,7 @@
     }
     @media (max-width: 640px) {
       .arch-nav {
+        flex: 1 1 auto;
         position: static;
         flex-direction: row;
         overflow-x: auto;
@@ -783,6 +783,10 @@
         max-height: none;
       }
       .arch-nav::-webkit-scrollbar { display: none; }
+    }
+    .arch-content {
+      flex: 1 1 auto;
+      min-width: 0;
     }
     .arch-nav-link {
       color: #696a6d;
