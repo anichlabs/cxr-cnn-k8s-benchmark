@@ -1097,7 +1097,7 @@
             <h3 class="arch-h3">Pipeline</h3>
             <p>Every request follows the same path from the public internet down to the model and back.</p>
             <div class="arch-diagram">
-              <svg viewBox="0 0 760 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Request pipeline">
+              <svg viewBox="0 0 900 460" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Request pipeline">
                 <defs>
                   <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
                     <path d="M 0 0 L 10 5 L 0 10 z" fill="#003399"/>
@@ -1110,178 +1110,74 @@
                   .lbl-sm { font-family: 'Inter', sans-serif; font-size: 11px; fill: #696a6d; }
                   .lbl-strong { font-weight: 600; }
                   .link { stroke: #003399; stroke-width: 1.5; fill: none; }
-                  .container-box { fill: #f7f7f8; stroke: #c8c9cb; stroke-dasharray: 4 3; }
-                  .arch-pane { padding-top: 16px; }
-    .section-sub {
-      color: #696a6d;
-      font-size: 1.05rem;
-      margin: 0 0 24px;
-    }
-    .arch-layout {
-      display: grid;
-      grid-template-columns: 180px 1fr;
-      gap: 32px;
-    }
-    @media (max-width: 720px) {
-      .arch-layout { grid-template-columns: 1fr; gap: 16px; }
-    }
-    .arch-nav {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      position: sticky;
-      top: 92px;
-      align-self: flex-start;
-      max-height: calc(100vh - 110px);
-      overflow-y: auto;
-      border-left: 1px solid #e2e2e4;
-      padding-left: 12px;
-      z-index: 5;
-    }
-    @media (max-width: 720px) {
-      .arch-nav {
-        position: static;
-        flex-direction: row;
-        overflow-x: auto;
-        border-left: none;
-        border-bottom: 1px solid #e2e2e4;
-        padding: 0 0 8px;
-        gap: 4px;
-        scrollbar-width: none;
-      }
-      .arch-nav::-webkit-scrollbar { display: none; }
-    }
-    .arch-nav-link {
-      color: #696a6d;
-      text-decoration: none;
-      font-size: 0.9rem;
-      padding: 6px 8px;
-      border-radius: 6px;
-      transition: color 0.15s ease, background 0.15s ease;
-      white-space: nowrap;
-    }
-    .arch-nav-link:hover { color: #003399; background: #f5f5f5; }
-    .arch-nav-link.active { color: #003399; background: #dbe4ff; font-weight: 500; }
-    .arch-content { min-width: 0; }
-    .arch-block { margin-bottom: 56px; scroll-margin-top: 92px; }
-    .arch-block:last-child { margin-bottom: 0; }
-    .arch-h3 {
-      font-family: 'Bricolage Grotesque', 'Inter', sans-serif;
-      font-size: 1.35rem;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      color: #000;
-      margin: 0 0 12px;
-    }
-    .arch-block p {
-      color: #2a2a2d;
-      font-size: 0.95rem;
-      line-height: 1.65;
-      max-width: 680px;
-      margin: 0 0 12px;
-    }
-    .arch-diagram {
-      background: #ffffff;
-      border: 1px solid #e2e2e4;
-      border-radius: 12px;
-      padding: 20px;
-      overflow-x: auto;
-      margin: 16px 0;
-    }
-    .arch-diagram svg { width: 100%; height: auto; max-width: 760px; display: block; margin: 0 auto; }
-    .arch-caption { color: #696a6d; font-size: 0.85rem; margin-top: 8px !important; }
-    .arch-table-wrap { overflow-x: auto; margin-top: 16px; }
-    .arch-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.9rem;
-    }
-    .arch-table th, .arch-table td {
-      text-align: left;
-      padding: 10px 14px;
-      border-bottom: 1px solid #e2e2e4;
-      vertical-align: top;
-    }
-    .arch-table th {
-      color: #000;
-      font-weight: 600;
-      background: #f7f7f8;
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-    .arch-table td:nth-child(2) { color: #003399; font-weight: 500; white-space: nowrap; }
-    .arch-table td { color: #2a2a2d; }
-    .arch-tree {
-      background: #f7f7f8;
-      border: 1px solid #e2e2e4;
-      border-radius: 12px;
-      padding: 16px 20px;
-      overflow-x: auto;
-      font-family: ui-monospace, "SF Mono", Menlo, monospace;
-      font-size: 0.82rem;
-      line-height: 1.55;
-      color: #2a2a2d;
-      margin-top: 12px;
-    }
-  </style>
+                  .link-dashed { stroke: #696a6d; stroke-width: 1.5; fill: none; stroke-dasharray: 4 4; }
+                  .vps-box { fill: #f7f7f8; stroke: #c8c9cb; stroke-dasharray: 4 3; }
+                </style>
 
                 <text x="20" y="24" class="lbl lbl-strong">Request pipeline</text>
 
+                <!-- ============== TOP: REQUEST PATH ============== -->
                 <!-- Browser -->
-                <rect class="node" x="20" y="50" width="120" height="60" rx="8"/>
-                <text x="80" y="80" text-anchor="middle" class="lbl lbl-strong">Browser</text>
-                <text x="80" y="98" text-anchor="middle" class="lbl-sm">visitor</text>
+                <rect class="node" x="20" y="50" width="130" height="58" rx="8"/>
+                <text x="85" y="78" text-anchor="middle" class="lbl lbl-strong">Browser</text>
+                <text x="85" y="96" text-anchor="middle" class="lbl-sm">visitor</text>
 
-                <path class="link" d="M 140 80 L 200 80" marker-end="url(#arrow)"/>
-                <text x="170" y="68" text-anchor="middle" class="lbl-sm">HTTPS</text>
+                <!-- arrow Browser -> Caddy -->
+                <line class="link" x1="150" y1="79" x2="220" y2="79" marker-end="url(#arrow)"/>
+                <text x="185" y="68" text-anchor="middle" class="lbl-sm">HTTPS</text>
 
                 <!-- Caddy -->
-                <rect class="node-bg" x="200" y="50" width="160" height="60" rx="8"/>
-                <text x="280" y="76" text-anchor="middle" class="lbl lbl-strong">Caddy 2.11</text>
-                <text x="280" y="94" text-anchor="middle" class="lbl-sm">TLS, HTTP/3, log, proxy</text>
+                <rect class="node-bg" x="220" y="50" width="160" height="58" rx="8"/>
+                <text x="300" y="76" text-anchor="middle" class="lbl lbl-strong">Caddy 2.11</text>
+                <text x="300" y="94" text-anchor="middle" class="lbl-sm">TLS, HTTP/3, proxy</text>
 
-                <path class="link" d="M 360 80 L 420 80" marker-end="url(#arrow)"/>
-                <text x="390" y="68" text-anchor="middle" class="lbl-sm">127.0.0.1:8001</text>
-
-                <!-- Hetzner VPS outer -->
-                <rect class="container-box" x="15" y="135" width="730" height="200" rx="10"/>
-                <text x="30" y="155" class="lbl lbl-strong">Hetzner CX33 VPS, Ubuntu 24.04</text>
-                <text x="30" y="171" class="lbl-sm">UFW: 22 / 80 / 443 only. fail2ban. unattended-upgrades.</text>
+                <!-- arrow Caddy -> Podman -->
+                <line class="link" x1="380" y1="79" x2="470" y2="79" marker-end="url(#arrow)"/>
+                <text x="425" y="68" text-anchor="middle" class="lbl-sm">127.0.0.1:8001</text>
 
                 <!-- Podman -->
-                <rect class="node" x="420" y="50" width="170" height="60" rx="8"/>
-                <text x="505" y="76" text-anchor="middle" class="lbl lbl-strong">Podman container</text>
-                <text x="505" y="94" text-anchor="middle" class="lbl-sm">rootless, port 8000</text>
+                <rect class="node" x="470" y="50" width="170" height="58" rx="8"/>
+                <text x="555" y="76" text-anchor="middle" class="lbl lbl-strong">Podman container</text>
+                <text x="555" y="94" text-anchor="middle" class="lbl-sm">rootless, port 8000</text>
 
-                <path class="link" d="M 505 110 L 505 175" marker-end="url(#arrow)"/>
+                <!-- arrow Podman -> FastAPI -->
+                <line class="link" x1="640" y1="79" x2="710" y2="79" marker-end="url(#arrow)"/>
 
-                <!-- FastAPI + uvicorn -->
-                <rect class="node-bg" x="420" y="180" width="170" height="60" rx="8"/>
-                <text x="505" y="206" text-anchor="middle" class="lbl lbl-strong">FastAPI + uvicorn</text>
-                <text x="505" y="224" text-anchor="middle" class="lbl-sm">/predict, /metrics, ...</text>
+                <!-- FastAPI -->
+                <rect class="node-bg" x="710" y="50" width="170" height="58" rx="8"/>
+                <text x="795" y="76" text-anchor="middle" class="lbl lbl-strong">FastAPI + uvicorn</text>
+                <text x="795" y="94" text-anchor="middle" class="lbl-sm">/predict, /metrics</text>
 
-                <path class="link" d="M 505 240 L 505 280" marker-end="url(#arrow)"/>
+                <!-- arrow FastAPI -> Models (downward) -->
+                <line class="link" x1="795" y1="108" x2="795" y2="160" marker-end="url(#arrow)"/>
 
                 <!-- PyTorch models -->
-                <rect class="node-bg" x="420" y="285" width="170" height="40" rx="8"/>
-                <text x="505" y="310" text-anchor="middle" class="lbl">PyTorch CPU, 8 checkpoints</text>
+                <rect class="node-bg" x="700" y="160" width="190" height="44" rx="8"/>
+                <text x="795" y="187" text-anchor="middle" class="lbl">PyTorch CPU, 8 checkpoints</text>
 
-                <!-- systemd / Quadlet -->
-                <rect class="node" x="50" y="195" width="180" height="50" rx="8"/>
-                <text x="140" y="220" text-anchor="middle" class="lbl lbl-strong">systemd user unit</text>
-                <text x="140" y="236" text-anchor="middle" class="lbl-sm">cxr-api.service, linger</text>
+                <!-- ============== MIDDLE: HETZNER VPS WRAPPER ============== -->
+                <rect class="vps-box" x="15" y="245" width="870" height="200" rx="10"/>
+                <text x="30" y="268" class="lbl lbl-strong">Hetzner VPS, Ubuntu 24.04</text>
+                <text x="30" y="285" class="lbl-sm">UFW: 22 / 80 / 443 only. fail2ban. unattended-upgrades. Auto-renewing Let's Encrypt cert.</text>
+
+                <!-- ============== BOTTOM: SUPERVISION / CI ============== -->
+                <!-- systemd -->
+                <rect class="node" x="40" y="310" width="200" height="50" rx="8"/>
+                <text x="140" y="335" text-anchor="middle" class="lbl lbl-strong">systemd user unit</text>
+                <text x="140" y="351" text-anchor="middle" class="lbl-sm">cxr-api.service, linger</text>
+
+                <!-- systemd -> Podman (dashed) -->
+                <path class="link-dashed" d="M 240 335 Q 380 335 470 110"/>
+                <text x="350" y="328" text-anchor="middle" class="lbl-sm">starts container at boot</text>
 
                 <!-- GitHub Actions -->
-                <rect class="node" x="50" y="265" width="180" height="55" rx="8"/>
-                <text x="140" y="290" text-anchor="middle" class="lbl lbl-strong">GitHub Actions</text>
-                <text x="140" y="307" text-anchor="middle" class="lbl-sm">push -> ssh -> rebuild -> healthcheck</text>
+                <rect class="node" x="40" y="380" width="280" height="50" rx="8"/>
+                <text x="180" y="404" text-anchor="middle" class="lbl lbl-strong">GitHub Actions</text>
+                <text x="180" y="420" text-anchor="middle" class="lbl-sm">push → ssh → rebuild → healthcheck</text>
 
-                <path class="link" d="M 230 220 L 420 220" stroke-dasharray="3 3"/>
-                <text x="325" y="212" text-anchor="middle" class="lbl-sm">starts container at boot</text>
-
-                <path class="link" d="M 230 292 L 420 75" stroke-dasharray="3 3"/>
-                <text x="380" y="160" class="lbl-sm">deploys on every push</text>
+                <!-- Actions -> Podman (dashed) -->
+                <path class="link-dashed" d="M 320 405 Q 480 405 555 110"/>
+                <text x="500" y="398" text-anchor="middle" class="lbl-sm">deploys on every push</text>
               </svg>
             </div>
             <p class="arch-caption">A single VPS hosts everything: TLS terminator, rootless container, model inference. systemd brings the container back at boot (linger enabled), GitHub Actions deploys on every push to main, Caddy renews the Let's Encrypt certificate automatically.</p>
