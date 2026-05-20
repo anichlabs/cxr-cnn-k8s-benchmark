@@ -1358,7 +1358,7 @@
     <div data-tab-content="deployment">
     <section class="dashboard-section">
       <h2 class="dashboard-title">Live metrics</h2>
-      <p class="dashboard-sub">Live from this server. Refreshes every 10 seconds.</p>
+      <p class="dashboard-sub">Live from this server. Refreshes every 5 seconds.</p>
       <div class="dashboard-grid">
         <div class="metric-tile">
           <div class="metric-label">Uptime</div>
@@ -1612,7 +1612,7 @@
       } catch (e) { /* silent */ }
     }
     refreshDashboard();
-    setInterval(refreshDashboard, 10000);
+    setInterval(refreshDashboard, 5000);
 
   
     // ----- Benchmark results bars -----
