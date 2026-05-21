@@ -1049,6 +1049,49 @@
       .arch-block.open .arch-table { min-width: 480px; }
       .arch-block.open .arch-diagram svg { min-width: 560px; }
     }
+    .dashboard-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #1a7f37;
+      background: #e6f4ea;
+      border: 1px solid #b7e0c2;
+      padding: 3px 10px;
+      border-radius: 999px;
+      transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    }
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #1a7f37;
+      box-shadow: 0 0 0 0 rgba(26, 127, 55, 0.6);
+      animation: live-pulse 1.8s ease-out infinite;
+    }
+    @keyframes live-pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(26, 127, 55, 0.55); }
+      70%  { box-shadow: 0 0 0 8px rgba(26, 127, 55, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(26, 127, 55, 0); }
+    }
+    /* Stale state: if a fetch fails, the badge greys out and stops pulsing. */
+    .live-badge.stale {
+      color: #909192;
+      background: #f0f0f1;
+      border-color: #e2e2e4;
+    }
+    .live-badge.stale .live-dot {
+      background: #909192;
+      animation: none;
+      box-shadow: none;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .live-dot { animation: none; }
+    }
   </style>
 </head>
 <body>
@@ -1305,6 +1348,49 @@
                   .link { stroke: #003399; stroke-width: 1.5; fill: none; }
                   .link-dashed { stroke: #696a6d; stroke-width: 1.5; fill: none; stroke-dasharray: 4 4; }
                   .vps-box { fill: #f7f7f8; stroke: #c8c9cb; stroke-dasharray: 4 3; }
+    .dashboard-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #1a7f37;
+      background: #e6f4ea;
+      border: 1px solid #b7e0c2;
+      padding: 3px 10px;
+      border-radius: 999px;
+      transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    }
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #1a7f37;
+      box-shadow: 0 0 0 0 rgba(26, 127, 55, 0.6);
+      animation: live-pulse 1.8s ease-out infinite;
+    }
+    @keyframes live-pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(26, 127, 55, 0.55); }
+      70%  { box-shadow: 0 0 0 8px rgba(26, 127, 55, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(26, 127, 55, 0); }
+    }
+    /* Stale state: if a fetch fails, the badge greys out and stops pulsing. */
+    .live-badge.stale {
+      color: #909192;
+      background: #f0f0f1;
+      border-color: #e2e2e4;
+    }
+    .live-badge.stale .live-dot {
+      background: #909192;
+      animation: none;
+      box-shadow: none;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .live-dot { animation: none; }
+    }
   </style>
 
                 <text x="20" y="24" class="lbl lbl-strong">Request pipeline</text>
@@ -1452,8 +1538,11 @@
     </div>
     <div data-tab-content="deployment">
     <section class="dashboard-section">
-      <h2 class="dashboard-title">Live metrics</h2>
-      <p class="dashboard-sub">Live from this server. Refreshes every 5 seconds.</p>
+      <div class="dashboard-head">
+        <h2 class="dashboard-title">Live metrics</h2>
+        <span class="live-badge" id="live-badge"><span class="live-dot"></span>Live</span>
+      </div>
+      <p class="dashboard-sub">Updated in real time from this server, every 5 seconds.</p>
       <div class="dashboard-grid">
         <div class="metric-tile">
           <div class="metric-label">Uptime</div>
@@ -1697,9 +1786,10 @@
       return d + 'd ' + (h % 24) + 'h';
     }
     async function refreshDashboard() {
+      const badge = document.getElementById('live-badge');
       try {
         const r = await fetch('/dashboard-metrics', { cache: 'no-store' });
-        if (!r.ok) return;
+        if (!r.ok) throw new Error('bad status');
         const m = await r.json();
         document.getElementById('metric-uptime').textContent = formatUptime(m.uptime_seconds);
         document.getElementById('metric-latency').textContent = m.avg_inference_latency_ms > 0
@@ -1713,7 +1803,12 @@
           const when = (m.build_time && m.build_time !== 'unknown') ? ' · deployed ' + m.build_time : '';
           fb.textContent = 'Build ' + m.git_commit + when;
         }
-      } catch (e) { /* silent */ }
+        // Successful fetch: the badge is live (green, pulsing).
+        if (badge) badge.classList.remove('stale');
+      } catch (e) {
+        // Failed fetch: badge goes grey/stale so the "Live" claim stays honest.
+        if (badge) badge.classList.add('stale');
+      }
     }
     refreshDashboard();
     setInterval(refreshDashboard, 5000);
