@@ -245,11 +245,28 @@ Write the Caddyfile:
 sudo tee /etc/caddy/Caddyfile > /dev/null <<'CFG'
 {
     email chris@anichlabs.com
+    order rate_limit before reverse_proxy
 }
 
 cxr.anichlabs.com {
     encode zstd gzip
-    reverse_proxy 127.0.0.1:8001
+
+    # Per-IP rate limit: 60 requests per minute, sliding window.
+    # Requires the caddy-ratelimit module (see section 5.8b).
+    rate_limit {
+        zone per_ip {
+            key    {remote_host}
+            events 60
+            window 1m
+        }
+    }
+
+    reverse_proxy 127.0.0.1:8001 {
+        header_up X-Real-IP {remote_host}
+        header_up X-Forwarded-For {remote_host}
+        header_up X-Forwarded-Proto {scheme}
+    }
+
     log {
         output file /var/log/caddy/cxr.access.log
         format json
@@ -266,6 +283,48 @@ DNS must already resolve `cxr.anichlabs.com` to the server's public
 IPv4 and IPv6 addresses for Caddy to obtain a certificate from
 Let's Encrypt. Set the A and AAAA records in Hetzner DNS (or your DNS
 provider) before reloading Caddy.
+
+### 5.8b Rate limiting (custom Caddy build)
+
+The `rate_limit` directive used in the Caddyfile above is not part of
+the standard Caddy binary. It comes from the third-party
+`caddy-ratelimit` module. Rather than installing a Go toolchain on
+this small VPS to build with xcaddy, fetch a prebuilt custom binary
+from Caddy's official download API (the module is compiled in
+server-side):
+
+```bash
+# Download a Caddy binary with the rate-limit module baked in.
+curl -sL "https://caddyserver.com/api/download?os=linux&arch=amd64&p=github.com/mholt/caddy-ratelimit" -o /tmp/caddy-new
+chmod +x /tmp/caddy-new
+
+# Confirm the module is present (should print http.handlers.rate_limit).
+/tmp/caddy-new list-modules | grep rate
+
+# Back up the current binary and config, then swap. The binary cannot
+# be overwritten while running ("Text file busy"), so stop, swap, start.
+sudo cp /usr/bin/caddy /usr/bin/caddy.backup
+sudo cp /etc/caddy/Caddyfile /etc/caddy/Caddyfile.backup
+sudo systemctl stop caddy
+sudo cp /tmp/caddy-new /usr/bin/caddy
+sudo systemctl start caddy
+systemctl is-active caddy
+```
+
+Verify the limiter fires by bursting 100 parallel requests; you should
+see HTTP 200 for roughly the first 60, then HTTP 429:
+
+```bash
+for i in $(seq 1 100); do curl -s -o /dev/null -w "%{http_code} " https://cxr.anichlabs.com/ & done; wait; echo
+```
+
+To roll back: stop Caddy, copy the `.backup` binary and Caddyfile back
+into place, start Caddy.
+
+Note: the official apt package overwrites `/usr/bin/caddy` on upgrade
+with the standard (no-module) binary. After any `apt upgrade` that
+touches Caddy, re-apply the custom binary using the steps above, or
+hold the package with `sudo apt-mark hold caddy`.
 
 ### 5.9 Enable user-service persistence (linger)
 
