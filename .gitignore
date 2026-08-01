@@ -12,3 +12,4 @@ experiments/checkpoints/*
 deployment/api/wheels/*
 *.whl
 
+experiments/checkpoints_leaked/
