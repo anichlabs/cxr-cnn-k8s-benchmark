@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22%3E%3Crect width=%2264%22 height=%2264%22 rx=%2212%22 fill=%22%23000000%22/%3E%3Ctext x=%2232%22 y=%2244%22 font-family=%22Bricolage Grotesque,Inter,sans-serif%22 font-size=%2238%22 font-weight=%22700%22 text-anchor=%22middle%22 fill=%22white%22%3EA%3C/text%3E%3C/svg%3E">
+  <title>CXR Classifier Demo · AnichLabs OÜ</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+      background: #ffffff;
+      color: #000000;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 50px;
+      padding: 30px 0;
+      border-bottom: 2px solid #003399;
+    }
+
+    header h1 {
+      font-size: 2.5rem;
+      color: #232F3E;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      font-size: 1.1rem;
+      color: #0A2540;
+    }
+
+    .logo {
+      font-size: 1.4rem;
+      color: #003399;
+      font-weight: 700;
+      margin-bottom: 24px;
+      letter-spacing: -0.01em;
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+
+    .upload-section {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .upload-section h2 {
+      font-size: 1.5rem;
+      color: #232F3E;
+      margin-bottom: 20px;
+    }
+
+    .drop-zone {
+      border: 3px dashed #003399;
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: #f9f9f9;
+    }
+
+    .drop-zone:hover {
+      background: #f0fffe;
+      border-color: #005a55;
+    }
+
+    .drop-zone.active {
+      background: #e6fffe;
+      border-color: #005a55;
+    }
+
+    .drop-zone p {
+      font-size: 1rem;
+      color: #0A2540;
+      margin-bottom: 10px;
+    }
+
+    .drop-zone small {
+      display: block;
+      color: #666;
+      margin-top: 10px;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .model-selection {
+      margin: 20px 0;
+    }
+
+    .model-selection label {
+      display: block;
+      font-weight: 600;
+      color: #232F3E;
+      margin-bottom: 10px;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+      color: #0A2540;
+      background: white;
+      cursor: pointer;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #003399;
+      box-shadow: 0 0 0 3px rgba(0, 181, 173, 0.1);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 20px;
+      background: #003399;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #005a55;
+    }
+
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .results-section {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .results-section h2 {
+      font-size: 1.5rem;
+      color: #232F3E;
+      margin-bottom: 20px;
+    }
+
+    .result-card {
+      display: none;
+      padding: 20px;
+      background: #f9f9f9;
+      border-left: 4px solid #003399;
+      border-radius: 4px;
+    }
+
+    .result-card.show {
+      display: block;
+    }
+
+    .prediction-result {
+      font-size: 1.3rem;
+      color: #232F3E;
+      margin: 15px 0;
+    }
+
+    .prediction-class {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #003399;
+      margin: 10px 0;
+    }
+
+    .metadata {
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #ddd;
+    }
+
+    .metadata p {
+      margin: 5px 0;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .loading.show {
+      display: block;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #003399;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error {
+      color: #d32f2f;
+      padding: 10px;
+      background: #ffebee;
+      border-left: 4px solid #d32f2f;
+      border-radius: 4px;
+      margin: 10px 0;
+      display: none;
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    .preview-image {
+      max-width: 100%;
+      max-height: 300px;
+      margin: 20px 0;
+      border-radius: 4px;
+      display: none;
+    }
+
+    .preview-image.show {
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+
+      header h1 {
+        font-size: 1.8rem;
+      }
+    }
+    .disclaimer {
+      margin-top: 20px;
+      padding: 12px 18px;
+      background: #fff4e5;
+      border-left: 4px solid #d97706;
+      border-radius: 4px;
+      color: #7c2d12;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+    .disclaimer a {
+      color: #7c2d12;
+      text-decoration: underline;
+    }
+
+    .samples-section {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #e5e5e5;
+    }
+    .samples-section > h3 {
+      font-size: 0.85rem;
+      color: #555;
+      margin-bottom: 10px;
+      font-weight: 500;
+    }
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #e5e5e5;
+    }
+    .tab-btn {
+      padding: 8px 14px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #555;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab-btn:hover { color: #003399; }
+    .tab-btn.active {
+      color: #003399;
+      border-bottom-color: #003399;
+      font-weight: 600;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .samples-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 48px);
+      gap: 6px;
+    }
+    .thumb {
+      width: 48px;
+      height: 48px;
+      object-fit: cover;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .thumb:hover {
+      border-color: #003399;
+      transform: scale(1.05);
+    }
+    .about-demo {
+      margin-top: 20px;
+      padding: 12px 18px;
+      background: #dbe4ff;
+      border-left: 4px solid #003399;
+      border-radius: 4px;
+      color: #003399;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .confidence-row {
+      margin-top: 12px;
+      font-size: 0.9rem;
+    }
+    .confidence-bar {
+      height: 6px;
+      background: #e5e5e5;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .confidence-fill {
+      height: 100%;
+      background: #003399;
+      transition: width 0.4s ease;
+    }
+    h1, h2, h3, .logo {
+      font-family: 'Bricolage Grotesque', 'Inter', sans-serif;
+      letter-spacing: -0.02em;
+    }
+    header h1 {
+      color: #000000;
+      font-weight: 600;
+    }
+    .logo {
+      color: #000000 !important;
+      font-weight: 600;
+    }
+    /* AnichLabs-style focus ring */
+    button:focus-visible, .tab-btn:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 2px solid #003399;
+      outline-offset: 2px;
+    }
+    .brand-anich { color: #000000; font-weight: 700; }
+    .brand-labs { color: #003399; font-weight: 700; }
+    .brand-ou { color: #909192; font-weight: 400; font-size: 0.85em; margin-left: 2px; }
+    .dashboard-section {
+      margin-top: 40px;
+      padding-top: 32px;
+      border-top: 1px solid #e2e2e4;
+    }
+    .dashboard-title {
+      font-family: 'Bricolage Grotesque', 'Inter', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #000000;
+      margin: 0 0 4px 0;
+    }
+    .dashboard-sub {
+      color: #696a6d;
+      font-size: 0.85rem;
+      margin: 0 0 20px 0;
+    }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 720px) {
+      .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .metric-tile {
+      background: #ffffff;
+      border: 1px solid #e2e2e4;
+      border-radius: 12px;
+      padding: 16px 18px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+    .metric-tile:hover {
+      transform: translateY(-1px);
+      border-color: #003399;
+      box-shadow: 0 1px 2px 0 rgba(0,0,0,0.04);
+    }
+    .metric-label {
+      color: #696a6d;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 8px;
+    }
+    .metric-value {
+      font-family: 'Bricolage Grotesque', 'Inter', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: #000000;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+    .benchmark-section {
+      margin-top: 40px;
+      padding-top: 32px;
+      border-top: 1px solid #e2e2e4;
+    }
+    .benchmark-title {
+      font-family: 'Bricolage Grotesque', 'Inter', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #000000;
+      margin: 0 0 4px 0;
+    }
+    .benchmark-sub {
+      color: #696a6d;
+      font-size: 0.85rem;
+      margin: 0 0 20px 0;
+    }
+    .benchmark-list { display: flex; flex-direction: column; gap: 8px; }
+    .benchmark-loading { color: #909192; font-size: 0.85rem; margin: 0; }
+    .bench-row {
+      display: grid;
+      grid-template-columns: 200px 1fr 80px;
+      gap: 12px;
+      align-items: center;
+      font-size: 0.85rem;
+    }
+    @media (max-width: 720px) {
+      .bench-row {
+        grid-template-columns: 1fr;
+        gap: 4px;
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+      }
+    }
+    .bench-name {
+      color: #2a2a2d;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .bench-name .bench-tag {
+      display: inline-block;
+      font-size: 0.65rem;
+      padding: 1px 6px;
+      border-radius: 3px;
+      margin-left: 6px;
+      font-weight: 500;
+      vertical-align: 1px;
+    }
+    .bench-tag.cxr { background: #dbe4ff; color: #003399; }
+    .bench-tag.imagenet { background: #f5f5f5; color: #696a6d; }
+    .bench-bar-track {
+      height: 10px;
+      background: #f0f1f3;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    .bench-bar-fill {
+      height: 100%;
+      background: #003399;
+      width: 0;
+      transition: width 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+      border-radius: 5px;
+    }
+    .bench-value {
+      font-family: 'Bricolage Grotesque', 'Inter', sans-serif;
+      font-weight: 600;
+      color: #000000;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo"><span class="brand-anich">Anich</span><span class="brand-labs">Labs</span><span class="brand-ou"> OÜ</span></div>
+      <h1>CXR Classifier Demo</h1>
+      <p>Multi-model chest X-ray classification with configurable AI models</p>
+      <div class="about-demo">
+        <strong>About this demo.</strong> A portfolio MLOps pipeline: containerised FastAPI service serving eight PyTorch checkpoints, behind Caddy reverse proxy with auto-HTTPS, deployed on a single Hetzner VPS with rootless Podman. The focus is the engineering and deployment, not the model.
+      </div>
+      <div class="disclaimer"><strong>Research demo only.</strong> Not a medical device. Not for clinical use, diagnosis, or treatment decisions. Trained on public research datasets (CheXpert, TBX11K); accuracy may drop sharply on X-rays from other hospitals or equipment. Do not use predictions here for any medical decision. See <a href="https://anichlabs.com" target="_blank" rel="noopener">project notes</a> for details.</div>
+    </header>
+
+    <div class="main-content">
+      <div class="upload-section">
+        <h2>Upload Image</h2>
+        
+        <div class="drop-zone" id="dropZone">
+          <p>Click to upload your chest X-ray image</p>
+          <small>Select from your computer</small>
+          <input type="file" id="fileInput" accept="image/jpeg,image/png">
+        </div>
+        <div class="samples-section">
+          <h3>Or try a sample image:</h3>
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="pneumonia">Pneumonia</button>
+            <button class="tab-btn" data-tab="tb">Tuberculosis</button>
+            <button class="tab-btn" data-tab="normal">Normal</button>
+          </div>
+          <div class="tab-panel active" data-panel="pneumonia">
+            <div class="samples-grid">
+              <img class="thumb" data-sample="pneumonia_01.jpg" src="samples/thumbs/pneumonia_01.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_02.jpg" src="samples/thumbs/pneumonia_02.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_03.jpg" src="samples/thumbs/pneumonia_03.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_04.jpg" src="samples/thumbs/pneumonia_04.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_05.jpg" src="samples/thumbs/pneumonia_05.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_06.jpg" src="samples/thumbs/pneumonia_06.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_07.jpg" src="samples/thumbs/pneumonia_07.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_08.jpg" src="samples/thumbs/pneumonia_08.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_09.jpg" src="samples/thumbs/pneumonia_09.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_10.jpg" src="samples/thumbs/pneumonia_10.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_11.jpg" src="samples/thumbs/pneumonia_11.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_12.jpg" src="samples/thumbs/pneumonia_12.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_13.jpg" src="samples/thumbs/pneumonia_13.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_14.jpg" src="samples/thumbs/pneumonia_14.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_15.jpg" src="samples/thumbs/pneumonia_15.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_16.jpg" src="samples/thumbs/pneumonia_16.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_17.jpg" src="samples/thumbs/pneumonia_17.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_18.jpg" src="samples/thumbs/pneumonia_18.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_19.jpg" src="samples/thumbs/pneumonia_19.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_20.jpg" src="samples/thumbs/pneumonia_20.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_21.jpg" src="samples/thumbs/pneumonia_21.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_22.jpg" src="samples/thumbs/pneumonia_22.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_23.jpg" src="samples/thumbs/pneumonia_23.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_24.jpg" src="samples/thumbs/pneumonia_24.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_25.jpg" src="samples/thumbs/pneumonia_25.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_26.jpg" src="samples/thumbs/pneumonia_26.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_27.jpg" src="samples/thumbs/pneumonia_27.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_28.jpg" src="samples/thumbs/pneumonia_28.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_29.jpg" src="samples/thumbs/pneumonia_29.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="pneumonia_30.jpg" src="samples/thumbs/pneumonia_30.webp" alt="sample" loading="lazy">
+            </div>
+          </div>
+          <div class="tab-panel" data-panel="tb">
+            <div class="samples-grid">
+              <img class="thumb" data-sample="tb_01.jpg" src="samples/thumbs/tb_01.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_02.jpg" src="samples/thumbs/tb_02.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_03.jpg" src="samples/thumbs/tb_03.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_04.jpg" src="samples/thumbs/tb_04.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_05.jpg" src="samples/thumbs/tb_05.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_06.jpg" src="samples/thumbs/tb_06.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_07.jpg" src="samples/thumbs/tb_07.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_08.jpg" src="samples/thumbs/tb_08.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_09.jpg" src="samples/thumbs/tb_09.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_10.jpg" src="samples/thumbs/tb_10.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_11.jpg" src="samples/thumbs/tb_11.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_12.jpg" src="samples/thumbs/tb_12.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_13.jpg" src="samples/thumbs/tb_13.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_14.jpg" src="samples/thumbs/tb_14.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_15.jpg" src="samples/thumbs/tb_15.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_16.jpg" src="samples/thumbs/tb_16.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_17.jpg" src="samples/thumbs/tb_17.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_18.jpg" src="samples/thumbs/tb_18.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_19.jpg" src="samples/thumbs/tb_19.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_20.jpg" src="samples/thumbs/tb_20.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_21.jpg" src="samples/thumbs/tb_21.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_22.jpg" src="samples/thumbs/tb_22.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_23.jpg" src="samples/thumbs/tb_23.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_24.jpg" src="samples/thumbs/tb_24.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_25.jpg" src="samples/thumbs/tb_25.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_26.jpg" src="samples/thumbs/tb_26.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_27.jpg" src="samples/thumbs/tb_27.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_28.jpg" src="samples/thumbs/tb_28.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_29.jpg" src="samples/thumbs/tb_29.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="tb_30.jpg" src="samples/thumbs/tb_30.webp" alt="sample" loading="lazy">
+            </div>
+          </div>
+          <div class="tab-panel" data-panel="normal">
+            <div class="samples-grid">
+              <img class="thumb" data-sample="normal_01.jpg" src="samples/thumbs/normal_01.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_02.jpg" src="samples/thumbs/normal_02.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_03.jpg" src="samples/thumbs/normal_03.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_04.jpg" src="samples/thumbs/normal_04.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_05.jpg" src="samples/thumbs/normal_05.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_06.jpg" src="samples/thumbs/normal_06.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_07.jpg" src="samples/thumbs/normal_07.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_08.jpg" src="samples/thumbs/normal_08.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_09.jpg" src="samples/thumbs/normal_09.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_10.jpg" src="samples/thumbs/normal_10.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_11.jpg" src="samples/thumbs/normal_11.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_12.jpg" src="samples/thumbs/normal_12.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_13.jpg" src="samples/thumbs/normal_13.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_14.jpg" src="samples/thumbs/normal_14.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_15.jpg" src="samples/thumbs/normal_15.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_16.jpg" src="samples/thumbs/normal_16.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_17.jpg" src="samples/thumbs/normal_17.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_18.jpg" src="samples/thumbs/normal_18.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_19.jpg" src="samples/thumbs/normal_19.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_20.jpg" src="samples/thumbs/normal_20.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_21.jpg" src="samples/thumbs/normal_21.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_22.jpg" src="samples/thumbs/normal_22.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_23.jpg" src="samples/thumbs/normal_23.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_24.jpg" src="samples/thumbs/normal_24.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_25.jpg" src="samples/thumbs/normal_25.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_26.jpg" src="samples/thumbs/normal_26.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_27.jpg" src="samples/thumbs/normal_27.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_28.jpg" src="samples/thumbs/normal_28.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_29.jpg" src="samples/thumbs/normal_29.webp" alt="sample" loading="lazy">
+              <img class="thumb" data-sample="normal_30.jpg" src="samples/thumbs/normal_30.webp" alt="sample" loading="lazy">
+            </div>
+          </div>
+        
+        </div>
+
+
+        <img id="previewImage" class="preview-image" alt="Preview">
+
+        <div class="model-selection">
+          <label for="modelSelect">Select Model:</label>
+          <select id="modelSelect">
+            <option value="">Loading models...</option>
+          </select>
+        </div>
+
+        <button id="predictBtn" disabled>Predict</button>
+        
+        <div class="error" id="errorMsg"></div>
+      </div>
+
+      <div class="results-section">
+        <h2>Prediction Results</h2>
+        
+        <div class="loading" id="loading">
+          <div class="spinner"></div>
+          <p>Processing image...</p>
+        </div>
+
+        <div class="result-card" id="resultCard">
+          <div class="prediction-result">
+            Predicted Class:
+            <div class="prediction-class" id="predictionClass">—</div>
+          </div>
+          
+          <div class="metadata">
+            <p><strong>Model Used:</strong> <span id="modelName">—</span></p>
+            <div id="confidenceRow" class="confidence-row" style="display:none;"></div>
+            <p><strong>Architecture:</strong> <span id="architecture">—</span></p>
+            <p><strong>Training Domain:</strong> <span id="domain">—</span></p>
+            <p><strong>Device:</strong> <span id="device">—</span></p>
+            <p><strong>Prediction Index:</strong> <span id="predictionIndex">—</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="benchmark-section">
+      <h2 class="benchmark-title">Benchmark results</h2>
+      <p class="benchmark-sub">Test-set accuracy of all eight trained models. From the production evaluation pipeline.</p>
+      <div class="benchmark-list" id="benchmark-list">
+        <p class="benchmark-loading">Loading…</p>
+      </div>
+    </section>
+
+    <section class="dashboard-section">
+      <h2 class="dashboard-title">Live metrics</h2>
+      <p class="dashboard-sub">Live from this server. Refreshes every 10 seconds.</p>
+      <div class="dashboard-grid">
+        <div class="metric-tile">
+          <div class="metric-label">Uptime</div>
+          <div class="metric-value" id="metric-uptime">—</div>
+        </div>
+        <div class="metric-tile">
+          <div class="metric-label">Avg inference</div>
+          <div class="metric-value" id="metric-latency">—</div>
+        </div>
+        <div class="metric-tile">
+          <div class="metric-label">Memory in use</div>
+          <div class="metric-value" id="metric-memory">—</div>
+        </div>
+        <div class="metric-tile">
+          <div class="metric-label">Models loaded</div>
+          <div class="metric-value" id="metric-models">—</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const API_BASE = '';
+    
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const previewImage = document.getElementById('previewImage');
+    const modelSelect = document.getElementById('modelSelect');
+    const predictBtn = document.getElementById('predictBtn');
+    const loading = document.getElementById('loading');
+    const resultCard = document.getElementById('resultCard');
+    const errorMsg = document.getElementById('errorMsg');
+
+    let currentFile = null;
+
+    document.addEventListener('DOMContentLoaded', loadModels);
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    // Sample gallery click handler (loads full image, not thumbnail)
+    document.querySelectorAll('.thumb').forEach((thumb) => {
+      thumb.addEventListener('click', async (e) => {
+        const name = e.target.dataset.sample;
+        try {
+          const resp = await fetch(`samples/fulls/${name}`);
+          const blob = await resp.blob();
+          const file = new File([blob], name, { type: blob.type });
+          currentFile = file;
+          handleFileSelect(file);
+        } catch (err) {
+          showError('Failed to load sample: ' + err.message);
+        }
+      });
+    });
+
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const target = btn.dataset.tab;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+        document.querySelectorAll('.tab-panel').forEach(panel => {
+          panel.classList.toggle('active', panel.dataset.panel === target);
+        });
+      });
+    });
+
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        currentFile = e.target.files[0];
+        handleFileSelect(e.target.files[0]);
+      }
+    });
+
+    function handleFileSelect(file) {
+      if (!file.type.startsWith('image/')) {
+        showError('Please select a valid image file');
+        return;
+      }
+
+      resultCard.classList.remove('show');
+      errorMsg.classList.remove('show');
+      loading.classList.remove('show');
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        previewImage.src = e.target.result;
+        previewImage.classList.add('show');
+        predictBtn.disabled = false;
+        if (predictBtn.dataset.originalText) predictBtn.textContent = predictBtn.dataset.originalText;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function loadModels() {
+      try {
+        const response = await fetch(`${API_BASE}/models`);
+        if (!response.ok) throw new Error('Failed to load models');
+        
+        const data = await response.json();
+        const models = data.available_models;
+
+        modelSelect.innerHTML = '';
+        models.forEach((model) => {
+          const option = document.createElement('option');
+          option.value = model.name;
+          option.textContent = `${model.name} - ${model.description}`;
+          modelSelect.appendChild(option);
+        });
+
+        if (models.length > 0) {
+          modelSelect.value = models[0].name;
+        }
+      } catch (error) {
+        showError('Failed to load models: ' + error.message);
+      }
+    }
+
+    predictBtn.addEventListener('click', predict);
+
+    async function predict() {
+      const file = currentFile;
+      const selectedModel = modelSelect.value;
+
+      if (!file || !selectedModel) {
+        showError('Please select an image and a model');
+        return;
+      }
+
+      loading.classList.add('show');
+      resultCard.classList.remove('show');
+      errorMsg.classList.remove('show');
+
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const response = await fetch(
+          `${API_BASE}/predict?model=${selectedModel}`,
+          {
+            method: 'POST',
+            body: formData
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Prediction failed');
+        }
+
+        const result = await response.json();
+        displayResults(result);
+      } catch (error) {
+        showError('Error: ' + error.message);
+      } finally {
+        loading.classList.remove('show');
+      }
+    }
+
+    function displayResults(result) {
+      document.getElementById('predictionClass').textContent = result.prediction_class;
+      document.getElementById('predictionIndex').textContent = result.prediction_index;
+      document.getElementById('modelName').textContent = result.model_name;
+      // Display confidence if present
+      const confEl = document.getElementById('confidenceRow');
+      if (result.confidence !== undefined) {
+        const pct = (result.confidence * 100).toFixed(1);
+        confEl.innerHTML = `<strong>Confidence:</strong> ${pct}%<div class="confidence-bar"><div class="confidence-fill" style="width:${pct}%"></div></div>`;
+        confEl.style.display = 'block';
+      } else {
+        confEl.style.display = 'none';
+      }
+      document.getElementById('architecture').textContent = result.architecture;
+      document.getElementById('domain').textContent = result.domain;
+      document.getElementById('device').textContent = result.device;
+      
+      resultCard.classList.add('show');
+    }
+
+    function showError(message) {
+      errorMsg.textContent = message;
+      errorMsg.classList.add('show');
+    }
+  
+    // ----- Live metrics dashboard -----
+    function formatUptime(seconds) {
+      if (seconds < 60) return seconds + 's';
+      const m = Math.floor(seconds / 60);
+      if (m < 60) return m + 'm';
+      const h = Math.floor(m / 60);
+      if (h < 24) return h + 'h ' + (m % 60) + 'm';
+      const d = Math.floor(h / 24);
+      return d + 'd ' + (h % 24) + 'h';
+    }
+    async function refreshDashboard() {
+      try {
+        const r = await fetch('/dashboard-metrics', { cache: 'no-store' });
+        if (!r.ok) return;
+        const m = await r.json();
+        document.getElementById('metric-uptime').textContent = formatUptime(m.uptime_seconds);
+        document.getElementById('metric-latency').textContent = m.avg_inference_latency_ms > 0
+          ? m.avg_inference_latency_ms.toFixed(0) + ' ms'
+          : '—';
+        document.getElementById('metric-memory').textContent = m.memory_mb + ' MB';
+        document.getElementById('metric-models').textContent = m.models_available + ' / 8';
+      } catch (e) { /* silent */ }
+    }
+    refreshDashboard();
+    setInterval(refreshDashboard, 10000);
+
+  
+    // ----- Benchmark results bars -----
+    async function loadBenchmark() {
+      const container = document.getElementById('benchmark-list');
+      try {
+        const r = await fetch('/evaluation-results', { cache: 'no-store' });
+        if (!r.ok) throw new Error('http ' + r.status);
+        const data = await r.json();
+        if (data.error || !data.results) throw new Error(data.error || 'no results');
+        // Fixed scale 0.90 -> 1.00: honest distance for ~92% Victorio
+        // while still showing the spread between the top models.
+        const scaleMin = 0.90;
+        const scaleMax = 1.00;
+        const range = scaleMax - scaleMin;
+        container.innerHTML = '';
+        data.results.forEach((row, i) => {
+          const pctTrue = (row.accuracy * 100).toFixed(2);
+          const pctBar = Math.max(0, Math.min(100, ((row.accuracy - scaleMin) / range) * 100));
+          const tagClass = row.normalisation.toLowerCase() === 'cxr' ? 'cxr' : 'imagenet';
+          const div = document.createElement('div');
+          div.className = 'bench-row';
+          div.innerHTML = `
+            <div class="bench-name">${row.model}<span class="bench-tag ${tagClass}">${row.normalisation}</span></div>
+            <div class="bench-bar-track"><div class="bench-bar-fill" data-target="${pctBar.toFixed(2)}"></div></div>
+            <div class="bench-value">${pctTrue}%</div>
+          `;
+          container.appendChild(div);
+        });
+        requestAnimationFrame(() => {
+          document.querySelectorAll('.bench-bar-fill').forEach((el, idx) => {
+            setTimeout(() => {
+              el.style.width = el.dataset.target + '%';
+            }, idx * 60);
+          });
+        });
+      } catch (e) {
+        container.innerHTML = '<p class="benchmark-loading">Could not load results.</p>';
+      }
+    }
+    loadBenchmark();
+
+  </script>
+</body>
+</html>
