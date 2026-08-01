@@ -84,6 +84,15 @@ print("\nassertions passed: splits are disjoint by path, content hash and patien
 for k, v in splits.items():
     print(f"{k:5s} {len(v):5d}  " + " ".join(f"{c}={n}" for c, n in v.Class.value_counts().items()))
 
+for k in splits:
+    v = splits[k]
+    v["rel_path"] = [str(Path(a).relative_to(ROOT/"data/chexpert")) if s0 == "chexpert"
+                     else str(Path(a).relative_to(ROOT/"data/tbx11k/imgs"))
+                     for a, s0 in zip(v.abs_path, v.source)]
+    v["Source"] = ["chexpert" if s0 == "chexpert" else "tbx11k" for s0 in v.source]
+    splits[k] = v.rename(columns={"source": "source_true"})[
+        ["rel_path", "Class", "Source", "source_true", "group", "hash", "abs_path"]]
+
 if DRY: print("\nDRY RUN - rerun with --write to save"); sys.exit(0)
 OUT.mkdir(exist_ok=True)
 for k, v in splits.items(): v.to_csv(OUT/f"{k}_split.csv", index=False)
