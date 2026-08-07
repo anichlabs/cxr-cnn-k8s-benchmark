@@ -1,0 +1,3 @@
+class,same_source_mean,diff_source_mean,difference,t_statistic,n_same,n_diff
+Normal,0.7114,0.6193,0.0922,153.1,486651,87405
+TB,0.604,0.5744,0.0295,67.2,341804,232252

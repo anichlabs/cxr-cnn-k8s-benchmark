@@ -1,0 +1,9 @@
+model,regime,n,accuracy,ci_low,ci_high,tb_recall
+mobilenet_v2,imagenet,275,0.9891,0.9684,0.9963,0.984
+mobilenet_v2,cxr,275,0.8982,0.8568,0.9286,0.872
+efficientnet_b0,imagenet,275,0.9745,0.9484,0.9876,0.96
+efficientnet_b0,cxr,275,0.9418,0.9076,0.9639,0.92
+resnet50,imagenet,275,0.9855,0.9632,0.9943,0.984
+resnet50,cxr,275,0.9636,0.9344,0.9801,0.968
+victorio,imagenet,275,0.8364,0.7881,0.8754,0.712
+victorio,cxr,275,0.8327,0.7841,0.8722,0.728

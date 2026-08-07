@@ -1,0 +1,37 @@
+{
+  "run_tag": "mobilenet_v2_imagenet_best",
+  "architecture": "mobilenet_v2",
+  "parameters": 2227715,
+  "regime": "imagenet",
+  "initialisation": "imagenet",
+  "normalisation": "imagenet",
+  "normalisation_mean": [
+    0.485,
+    0.456,
+    0.406
+  ],
+  "normalisation_std": [
+    0.229,
+    0.224,
+    0.225
+  ],
+  "mode": "full",
+  "img_size": 256,
+  "epochs_configured": 60,
+  "epochs_run": 19,
+  "batch_size": 128,
+  "base_lr": 0.0001,
+  "weight_decay": 0.0001,
+  "finetune": true,
+  "patience": 8,
+  "label_smoothing": 0.05,
+  "seed": 42,
+  "splits_dir": "experiments/pools_clean",
+  "train_size": 2255,
+  "val_size": 481,
+  "best_val_acc": 0.972972972972973,
+  "checkpoint": "mobilenet_v2_imagenet_best.pt",
+  "torch_version": "2.10.0.dev20250930+cu128",
+  "device": "NVIDIA GeForce RTX 5090 Laptop GPU",
+  "timestamp": "2026-08-04T02:15:38"
+}

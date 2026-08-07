@@ -1,0 +1,37 @@
+{
+  "run_tag": "victorio_cxr_best",
+  "architecture": "victorio",
+  "parameters": 6627,
+  "regime": "cxr",
+  "initialisation": "random",
+  "normalisation": "cxr",
+  "normalisation_mean": [
+    0.5336471796035767,
+    0.5336471796035767,
+    0.5336471796035767
+  ],
+  "normalisation_std": [
+    0.26645559072494507,
+    0.26645559072494507,
+    0.26645559072494507
+  ],
+  "mode": "full",
+  "img_size": 256,
+  "epochs_configured": 60,
+  "epochs_run": 44,
+  "batch_size": 128,
+  "base_lr": 0.0001,
+  "weight_decay": 0.0001,
+  "finetune": true,
+  "patience": 8,
+  "label_smoothing": 0.05,
+  "seed": 42,
+  "splits_dir": "experiments/pools_clean",
+  "train_size": 2255,
+  "val_size": 481,
+  "best_val_acc": 0.7962577962577962,
+  "checkpoint": "victorio_cxr_best.pt",
+  "torch_version": "2.10.0.dev20250930+cu128",
+  "device": "NVIDIA GeForce RTX 5090 Laptop GPU",
+  "timestamp": "2026-08-04T03:01:51"
+}

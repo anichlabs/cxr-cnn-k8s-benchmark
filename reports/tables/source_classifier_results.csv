@@ -1,0 +1,4 @@
+task,n_test,accuracy,balanced_accuracy,auroc,majority_baseline
+Global: CheXpert versus all other sources,480,1.0,1.0,1.0,0.6667
+Within Normal: TBX11K versus Montgomery/Shenzhen/DA/DB,160,1.0,1.0,1.0,0.9375
+Within TB: TBX11K versus Montgomery/Shenzhen/DA/DB,160,0.9875,0.9817,0.9986,0.7812
