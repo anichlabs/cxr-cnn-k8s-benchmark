@@ -13,3 +13,6 @@ deployment/api/wheels/*
 *.whl
 
 experiments/checkpoints_leaked/
+reports/thesis/
+.ipynb_checkpoints/
+__pycache__/
